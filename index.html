@@ -49,9 +49,6 @@
   .b-result { background: #dbeafe; color: #1e40af; }
   .b-miss { background: #fee2e2; color: #991b1b; }
 
-  /* Subtotals row */
-  .sub-row td { background: #fafaf8; font-size: 12px; color: #888; }
-
   /* ── Meciuri ── */
   .match-filters { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
   .filter-btn { padding: 7px 14px; border: 1px solid #e8e8e0; background: #fff; border-radius: 99px; font-size: 13px; cursor: pointer; color: #666; transition: all .15s; }
@@ -139,7 +136,6 @@
 
 <div class="content">
 
-  <!-- CLASAMENT -->
   <div id="tab-clasament" class="section active">
     <div class="standings-card">
       <table class="standings-table">
@@ -158,7 +154,6 @@
     <p style="font-size:12px;color:#aaa;text-align:center">Apasă pe un jucător pentru detalii · Actualizat din Excel</p>
   </div>
 
-  <!-- MECIURI -->
   <div id="tab-meciuri" class="section">
     <div class="match-filters">
       <button class="filter-btn active" onclick="filterMatches('all', this)">Toate</button>
@@ -168,7 +163,6 @@
     <div id="matches-list" class="matches-list"></div>
   </div>
 
-  <!-- BONUS -->
   <div id="tab-bonus" class="section">
     <div class="bonus-card">
       <div class="bonus-title">🏆 Câștigătoare CM 2026</div>
@@ -178,42 +172,21 @@
       <div class="bonus-title">⚽ Golgheter CM 2026</div>
       <div id="bonus-gold-list"></div>
     </div>
-    <div class="info-card">
-      <div class="info-title">Punctaj bonus</div>
-      <div class="info-text">
-        Câștigătoare corectă: <strong>10 puncte</strong> (locul 1) · <strong>6 puncte</strong> (locul 2) · <strong>3 puncte</strong> (locul 3)<br>
-        Golgheter corect: <strong>10 puncte</strong> (locul 1) · <strong>6 puncte</strong> (locul 2) · <strong>3 puncte</strong> (locul 3)<br><br>
-        Punctele bonus se adaugă la finalul turneului.
-      </div>
-    </div>
   </div>
 
-  <!-- REGULI -->
   <div id="tab-reguli" class="section">
     <div class="info-card">
       <div class="info-title">Cum se calculează punctele</div>
       <div class="info-text">
         <div class="score-legend">
-          <div class="legend-item"><span class="badge b-exact">3p</span> Scor exact ghicit (ex: 2-1 real → 2-1 pronostic)</div>
-          <div class="legend-item"><span class="badge b-result">1p</span> Rezultat corect — câștigătoare sau egal (1/X/2)</div>
+          <div class="legend-item"><span class="badge b-exact">3p</span> Scor exact ghicit</div>
+          <div class="legend-item"><span class="badge b-result">1p</span> Rezultat corect (1/X/2)</div>
           <div class="legend-item"><span class="badge b-miss">0p</span> Pronostic greșit</div>
         </div>
       </div>
     </div>
-    <div class="info-card">
-      <div class="info-title">Grupă stage: 72 meciuri</div>
-      <div class="info-text">12 grupe × 6 meciuri. Fiecare grupă are 4 echipe, fiecare joacă cu celelalte două. Primele 2 din fiecare grupă + 8 locuri 3 avansează în optimi.</div>
-    </div>
-    <div class="info-card">
-      <div class="info-title">Actualizare scoruri</div>
-      <div class="info-text">
-        Scorurile sunt introduse manual în Excel de administratorul concursului și exportate în această pagină.<br><br>
-        <strong>Vrei scoruri live automate?</strong> Înregistrează-te la <a href="https://www.football-data.org" target="_blank" style="color:#1d4ed8;text-decoration:underline">football-data.org</a> pentru un API gratuit și actualizează cheia API în codul sursă al acestei pagini.
-      </div>
-    </div>
   </div>
 
-  <!-- PROFIL JUCATOR -->
   <div id="tab-profil" class="section">
     <div class="profile-back" onclick="showTab('clasament')">← Înapoi la clasament</div>
     <div class="profile-header">
@@ -248,6 +221,30 @@ const FLAGS = {
   "Mexic":"🇲🇽","Africa de Sud":"🇿🇦","Coreea de Sud":"🇰🇷","Cehia":"🇨🇿","Canada":"🇨🇦","Bosnia și Herțegovina":"🇧🇦","Qatar":"🇶🇦","Elveția":"🇨🇭","SUA":"🇺🇸","Paraguay":"🇵🇾","Australia":"🇦🇺","Turcia":"🇹🇷","Brazilia":"🇧🇷","Maroc":"🇲🇦","Haiti":"🇭🇹","Scoția":"🏴󠁧󠁢󠁳󠁣󠁴󠁿","Germania":"🇩🇪","Curacao":"🇨🇼","Ecuador":"🇪🇨","Coasta de Fildeș":"🇨🇮","Țările de Jos":"🇳🇱","Japonia":"🇯🇵","Suedia":"🇸🇪","Tunisia":"🇹🇳","Spania":"🇪🇸","Capul Verde":"🇨🇻","Uruguay":"🇺🇾","Arabia Saudită":"🇸🇦","Belgia":"🇧🇪","Egipt":"🇪🇬","Noua Zeelandă":"🇳🇿","Iran":"🇮🇷","Franța":"🇫🇷","Senegal":"🇸🇳","Norvegia":"🇳🇴","Irak":"🇮🇶","Argentina":"🇦🇷","Algeria":"🇩🇿","Iordania":"🇯🇴","Austria":"🇦🇹","Portugalia":"🇵🇹","DR Congo":"🇨🇩","Uzbekistan":"🇺🇿","Columbia":"🇨🇴","Anglia":"🏴󠁧󠁢󠁥󠁮󠁧󠁿","Croația":"🇭🇷","Panama":"🇵🇦","Ghana":"🇬🇭"
 };
 
+const TEAM_MAP = {
+  "Mexico":"Mexic","South Africa":"Africa de Sud","Korea Republic":"Coreea de Sud",
+  "South Korea":"Coreea de Sud","Czechia":"Cehia","Czech Republic":"Cehia",
+  "Canada":"Canada","Bosnia and Herzegovina":"Bosnia și Herțegovina",
+  "Bosnia & Herzegovina":"Bosnia și Herțegovina","Qatar":"Qatar",
+  "Switzerland":"Elveția","USA":"SUA","United States":"SUA","Paraguay":"Paraguay",
+  "Australia":"Australia","Turkey":"Turcia","Türkiye":"Turcia","Brazil":"Brazilia",
+  "Morocco":"Maroc","Haiti":"Haiti","Scotland":"Scoția","Germany":"Germania",
+  "Curaçao":"Curacao","Curacao":"Curacao","Ecuador":"Ecuador",
+  "Ivory Coast":"Coasta de Fildeș","Côte d'Ivoire":"Coasta de Fildeș",
+  "Netherlands":"Țările de Jos","Japan":"Japonia","Sweden":"Suedia",
+  "Tunisia":"Tunisia","Spain":"Spania","Cape Verde":"Capul Verde",
+  "Uruguay":"Uruguay","Saudi Arabia":"Arabia Saudită","Belgium":"Belgia",
+  "Egypt":"Egipt","New Zealand":"Noua Zeelandă","Iran":"Iran","France":"Franța",
+  "Senegal":"Senegal","Norway":"Norvegia","Iraq":"Irak","Algeria":"Algeria",
+  "Argentina":"Argentina","Jordan":"Iordania","Austria":"Austria",
+  "Portugal":"Portugalia","DR Congo":"DR Congo","Congo DR":"DR Congo",
+  "Democratic Republic of Congo":"DR Congo","Uzbekistan":"Uzbekistan",
+  "Colombia":"Columbia","England":"Anglia","Croatia":"Croația","Panama":"Panama",
+  "Ghana":"Ghana"
+};
+
+function mapTeam(name) { return TEAM_MAP[name] || name; }
+
 // ═══════════════════════════════════════
 // LOGICĂ PUNCTAJ
 // ═══════════════════════════════════════
@@ -280,7 +277,7 @@ function computeStandings() {
 }
 
 // ═══════════════════════════════════════
-// RENDER CLASAMENT
+// RENDER CLASAMENT & MECIURI
 // ═══════════════════════════════════════
 function renderStandings() {
   const totals = computeStandings();
@@ -307,17 +304,11 @@ function renderStandings() {
   });
 }
 
-// ═══════════════════════════════════════
-// RENDER MECIURI
-// ═══════════════════════════════════════
 let currentFilter = 'all';
-
 function renderMatches(filter) {
   currentFilter = filter || currentFilter;
   const container = document.getElementById('matches-list');
   container.innerHTML = '';
-  const played = Object.values(SCORES).filter(s => s.s1 !== null).length;
-  document.getElementById('subtitle').textContent = `${played} din 72 meciuri jucate · Faza grupelor`;
 
   Object.entries(SCORES).forEach(([mid, sc]) => {
     const isPlayed = sc.s1 !== null;
@@ -375,35 +366,18 @@ function filterMatches(filter, btn) {
   renderMatches(filter);
 }
 
-// ═══════════════════════════════════════
-// RENDER BONUS
-// ═══════════════════════════════════════
 function renderBonus() {
   const wList = document.getElementById('bonus-winner-list');
   const gList = document.getElementById('bonus-gold-list');
-  wList.innerHTML = '';
-  gList.innerHTML = '';
-
+  wList.innerHTML = ''; gList.innerHTML = '';
   PARTICIPANTS.forEach(p => {
-    const pick = CASTIGATOARE[p] || '—';
-    const row = document.createElement('div');
-    row.className = 'bonus-row';
-    row.innerHTML = `<span><strong>${p}</strong></span><span class="bonus-pick">${pick}</span>`;
-    wList.appendChild(row);
-  });
-
-  PARTICIPANTS.forEach(p => {
-    const pick = GOLGHETER[p] || '—';
-    const row = document.createElement('div');
-    row.className = 'bonus-row';
-    row.innerHTML = `<span><strong>${p}</strong></span><span class="bonus-pick">${pick}</span>`;
-    gList.appendChild(row);
+    const pickW = CASTIGATOARE[p] || '—';
+    const pickG = GOLGHETER[p] || '—';
+    wList.innerHTML += `<div class="bonus-row"><span><strong>${p}</strong></span><span class="bonus-pick">${pickW}</span></div>`;
+    gList.innerHTML += `<div class="bonus-row"><span><strong>${p}</strong></span><span class="bonus-pick">${pickG}</span></div>`;
   });
 }
 
-// ═══════════════════════════════════════
-// PROFIL JUCATOR
-// ═══════════════════════════════════════
 function showProfile(name) {
   const totals = computeStandings();
   const t = totals[name];
@@ -426,178 +400,151 @@ function showProfile(name) {
     if (pts === 3) { chipCls = 'pred-chip p-exact'; ptsLabel = '+3 pct'; }
     else if (pts === 1) { chipCls = 'pred-chip p-result'; ptsLabel = '+1 pct'; }
 
-    const card = document.createElement('div');
-    card.className = 'match-card';
-    card.innerHTML = `
-      <div class="match-body">
-        <div class="score-row">
-          <div class="team"><span class="flag">${f1}</span><span class="tname">${sc.team1}</span></div>
-          <div class="score-box"><span class="score-num">${sc.s1} — ${sc.s2}</span></div>
-          <div class="team team-r"><span class="tname">${sc.team2}</span><span class="flag">${f2}</span></div>
-        </div>
-        <div class="preds-section">
-          <span class="${chipCls}"><span class="pname">Pronostic:</span> ${pred[0]}-${pred[1]} <span class="pts-tag">${ptsLabel}</span></span>
+    container.innerHTML += `
+      <div class="match-card">
+        <div class="match-body">
+          <div class="score-row">
+            <div class="team"><span class="flag">${f1}</span><span class="tname">${sc.team1}</span></div>
+            <div class="score-box"><span class="score-num">${sc.s1} — ${sc.s2}</span></div>
+            <div class="team team-r"><span class="tname">${sc.team2}</span><span class="flag">${f2}</span></div>
+          </div>
+          <div class="preds-section">
+            <span class="${chipCls}"><span class="pname">Pronostic:</span> ${pred[0]}-${pred[1]} <span class="pts-tag">${ptsLabel}</span></span>
+          </div>
         </div>
       </div>`;
-    container.appendChild(card);
   });
-
   showTab('profil');
 }
 
-// ═══════════════════════════════════════
-// TAB NAVIGATION
-// ═══════════════════════════════════════
 function showTab(id) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + id).classList.add('active');
   const btns = document.querySelectorAll('.tab-btn');
   btns.forEach(b => { if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + id + "'")) b.classList.add('active'); });
-  if (id === 'profil') return; // no matching tab button, that's fine
 }
 
-// ═══════════════════════════════════════
-// API LIVE — worldcup26.ir
-// ═══════════════════════════════════════
-
-// Mapping nume echipe engleza -> romana (cum sunt in Excel)
-const TEAM_MAP = {
-  "Mexico":"Mexic","South Africa":"Africa de Sud","Korea Republic":"Coreea de Sud",
-  "South Korea":"Coreea de Sud","Czechia":"Cehia","Czech Republic":"Cehia",
-  "Canada":"Canada","Bosnia and Herzegovina":"Bosnia și Herțegovina",
-  "Bosnia & Herzegovina":"Bosnia și Herțegovina","Qatar":"Qatar",
-  "Switzerland":"Elveția","USA":"SUA","United States":"SUA","Paraguay":"Paraguay",
-  "Australia":"Australia","Turkey":"Turcia","Türkiye":"Turcia","Brazil":"Brazilia",
-  "Morocco":"Maroc","Haiti":"Haiti","Scotland":"Scoția","Germany":"Germania",
-  "Curaçao":"Curacao","Curacao":"Curacao","Ecuador":"Ecuador",
-  "Ivory Coast":"Coasta de Fildeș","Côte d'Ivoire":"Coasta de Fildeș",
-  "Netherlands":"Țările de Jos","Japan":"Japonia","Sweden":"Suedia",
-  "Tunisia":"Tunisia","Spain":"Spania","Cape Verde":"Capul Verde",
-  "Uruguay":"Uruguay","Saudi Arabia":"Arabia Saudită","Belgium":"Belgia",
-  "Egypt":"Egipt","New Zealand":"Noua Zeelandă","Iran":"Iran","France":"Franța",
-  "Senegal":"Senegal","Norway":"Norvegia","Iraq":"Irak","Algeria":"Algeria",
-  "Argentina":"Argentina","Jordan":"Iordania","Austria":"Austria",
-  "Portugal":"Portugalia","DR Congo":"DR Congo","Congo DR":"DR Congo",
-  "Democratic Republic of Congo":"DR Congo","Uzbekistan":"Uzbekistan",
-  "Colombia":"Columbia","England":"Anglia","Croatia":"Croația","Panama":"Panama",
-  "Ghana":"Ghana"
-};
-
-function mapTeam(name) {
-  return TEAM_MAP[name] || name;
-}
-
-// Construieste un index rapid: "Echipa1 vs Echipa2" -> mid
 function buildMatchIndex() {
   const idx = {};
-  Object.entries(SCORES).forEach(([mid, sc]) => {
-    const key = sc.team1 + '|||' + sc.team2;
-    idx[key] = mid;
-  });
+  Object.entries(SCORES).forEach(([mid, sc]) => { idx[sc.team1 + '|' + sc.team2] = mid; });
   return idx;
 }
 
+// ═══════════════════════════════════════
+// API FETCH LIVE - football-data.org
+// ═══════════════════════════════════════
 async function fetchLiveScores() {
-    const apiIndicator = document.getElementById('api-status');
-    try {
-      // 1. Apelăm API-ul printr-un proxy gratuit pentru a ocoli blocajele CORS de pe telefon
-      const proxyUrl = 'https://api.allorigins.win/get?url=';
-      const targetUrl = encodeURIComponent('https://worldcup26.ir/get/games');
+  const apiIndicator = document.getElementById('api-status');
+  if (apiIndicator) { apiIndicator.textContent = '⏳ Se actualizează...'; apiIndicator.style.color = '#888'; }
+  
+  // Aici a fost pus TOKEN-UL TĂU direct în cod:
+  const API_KEY = 'ce8fc0d4521c403c80025b5b3d4b2d86'; 
 
-      const response = await fetch(proxyUrl + targetUrl);
-      if (!response.ok) throw new Error('HTTP error! status: ' + response.status);
+  try {
+    if (API_KEY === 'INTRODU_CHEIA_TA_AICI') {
+      throw new Error('API Key lipsă! Actualizează constanta API_KEY în cod.');
+    }
 
-      const proxyData = await response.json();
-      
-      // 2. Proxy-ul pune răspunsul API-ului ca text (string) în proprietatea "contents", deci îl parsăm în JSON
-      const data = JSON.parse(proxyData.contents);
+    // URL-ul pentru meciurile de la Campionatul Mondial (Cod: WC)
+    const targetUrl = 'https://api.football-data.org/v4/competitions/WC/matches';
+    
+    // Proxy stabil care permite trimiterea cheii API de pe telefon
+    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
 
-      // 3. Extragem meciurile
-      const games = Array.isArray(data) ? data : (data.games || data.matches || data.data || []);
-      if (!games.length) throw new Error('No games in response');
-
-      const idx = buildMatchIndex();
-      let updated = 0;
-      let liveCount = 0;
-
-      // 4. Parcurgem meciurile aduse de API
-      games.forEach(g => {
-        const t1 = mapTeam(g.home_team || g.homeTeam || g.team1);
-        const t2 = mapTeam(g.away_team || g.awayTeam || g.team2);
-        let s1 = g.home_score ?? g.homeScore ?? g.score1;
-        let s2 = g.away_score ?? g.awayScore ?? g.score2;
-        
-        // Dacă API-ul ține scorul direct ca string "2-1" în anumite cazuri
-        if (typeof s1 === 'string' && s1.includes('-')) {
-          const parts = s1.split('-');
-          s1 = parseInt(parts[0]);
-          s2 = parseInt(parts[1]);
-        }
-
-        const mStatus = (g.status || '').toLowerCase();
-        const isLive = mStatus.includes('live') || mStatus.includes('progress') || mStatus.includes('play');
-        if (isLive) liveCount++;
-
-        if (t1 && t2 && s1 !== undefined && s2 !== undefined && s1 !== null && s2 !== null) {
-          const key = t1 + '|' + t2;
-          const matchId = idx[key];
-          if (matchId && SCORES[matchId]) {
-            SCORES[matchId].s1 = parseInt(s1);
-            SCORES[matchId].s2 = parseInt(s2);
-            updated++;
-          }
-        }
-      });
-
-      // 5. Actualizăm interfața grafică cu noul status
-      if (apiIndicator) {
-        apiIndicator.textContent = `🟢 API Live · ${updated} meciuri sincronizate ${liveCount ? ' · ' + liveCount + ' LIVE' : ''}`;
-        apiIndicator.style.color = liveCount ? '#dc2626' : '#16a34a';
+    const response = await fetch(proxyUrl, {
+      method: 'GET',
+      headers: {
+        'X-Auth-Token': API_KEY, // Trimitem cheia ta de acces
+        'Accept': 'application/json'
       }
+    });
+
+    if (!response.ok) throw new Error('HTTP status ' + response.status);
+
+    const data = await response.json();
+    const games = data.matches || [];
+    if (!games.length) throw new Error('Nu s-au găsit meciuri în răspuns');
+
+    const idx = buildMatchIndex();
+    let updated = 0;
+    let liveCount = 0;
+
+    // Prelucrăm JSON-ul specific football-data.org
+    games.forEach(g => {
+      // Aici numele echipelor se află în obiecte (ex: g.homeTeam.name)
+      const t1 = mapTeam(g.homeTeam?.name || g.homeTeam?.shortName || '');
+      const t2 = mapTeam(g.awayTeam?.name || g.awayTeam?.shortName || '');
       
-      if (liveCount > 0) {
-        document.getElementById('live-badge').style.display = 'flex';
+      // Extragem scorurile (Full Time)
+      const s1 = g.score?.fullTime?.home;
+      const s2 = g.score?.fullTime?.away;
+
+      // Statusul meciului (SCHEDULED, TIMED, IN_PLAY, PAUSED, FINISHED)
+      const status = g.status; 
+      const isFinished = status === 'FINISHED';
+      const isLive = status === 'IN_PLAY' || status === 'PAUSED';
+
+      if (isLive) liveCount++;
+
+      // Dacă avem un scor valid, actualizăm dicționarul
+      if ((isFinished || isLive) && s1 !== null && s2 !== null && s1 !== undefined) {
+        const mid = idx[t1 + '|' + t2];
+        if (mid && SCORES[mid]) {
+          SCORES[mid].s1 = s1;
+          SCORES[mid].s2 = s2;
+          updated++;
+        }
+      }
+    });
+
+    // Actualizăm indicatorul grafic
+    if (apiIndicator) {
+      apiIndicator.textContent = `🟢 API Live (football-data) · ${updated} meciuri sincronizate (Apasă pt refresh)`;
+      apiIndicator.style.color = liveCount > 0 ? '#dc2626' : '#16a34a';
+    }
+    
+    document.getElementById('live-badge').style.display = liveCount > 0 ? 'flex' : 'none';
+
+    renderStandings();
+    renderMatches();
+    const playedNow = Object.values(SCORES).filter(s => s.s1 !== null).length;
+    document.getElementById('subtitle').textContent = `${playedNow} din 72 meciuri jucate · Faza grupelor`;
+
+  } catch (err) {
+    console.warn('API error:', err);
+    if (apiIndicator) {
+      if (err.message.includes('API Key lipsă')) {
+        apiIndicator.textContent = '🔴 Adaugă cheia API în cod (vezi consola)!';
+        apiIndicator.style.color = '#dc2626';
       } else {
-        document.getElementById('live-badge').style.display = 'none';
-      }
-
-      // Re-render cu datele noi aduse din API
-      renderStandings();
-      renderMatches();
-      const playedNow = Object.values(SCORES).filter(s => s.s1 !== null).length;
-      document.getElementById('subtitle').textContent = `${playedNow} din 72 meciuri jucate · Faza grupelor`;
-
-    } catch (err) {
-      console.warn('API error:', err.message);
-      // Fallback: Dacă pică și proxy-ul, punem scorurile din Excel
-      if (apiIndicator) {
-        apiIndicator.textContent = '🟡 Scoruri din Excel (API indisponibil)';
+        apiIndicator.textContent = '🟡 Scoruri din Excel. (Apasă pt reîncercare)';
         apiIndicator.style.color = '#d97706';
       }
     }
   }
+}
 
 // ═══════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════
-const played = Object.values(SCORES).filter(s => s.s1 !== null).length;
-document.getElementById('subtitle').textContent = `${played} din 72 meciuri jucate · Faza grupelor`;
+const playedInit = Object.values(SCORES).filter(s => s.s1 !== null).length;
+document.getElementById('subtitle').textContent = `${playedInit} din 72 meciuri jucate · Faza grupelor`;
 
 renderStandings();
 renderMatches('all');
 renderBonus();
 
-// Adauga indicator status API sub header
 const apiDiv = document.createElement('div');
 apiDiv.id = 'api-status';
-apiDiv.style.cssText = 'text-align:center;font-size:12px;color:#aaa;padding:6px 0 0;';
+apiDiv.style.cssText = 'text-align:center; font-size:12px; padding:8px; cursor:pointer; font-weight:500; border-bottom:1px solid #e8e8e0; background:#fff;';
 apiDiv.textContent = 'Se încarcă scoruri live...';
+apiDiv.onclick = fetchLiveScores;
 document.querySelector('.content').insertBefore(apiDiv, document.querySelector('.section'));
 
-// Fetch imediat apoi la fiecare 60 secunde
 fetchLiveScores();
-setInterval(fetchLiveScores, 120000);
+setInterval(fetchLiveScores, 4 * 60 * 1000); // Autorefresh la fiecare 4 minute
+
 </script>
 </body>
 </html>
