@@ -499,65 +499,84 @@ function buildMatchIndex() {
 }
 
 async function fetchLiveScores() {
-  const apiIndicator = document.getElementById('api-status');
-  try {
-    const resp = await fetch('https://worldcup26.ir/get/games', {
-      headers: { 'Accept': 'application/json' }
-    });
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    const data = await resp.json();
-    const games = Array.isArray(data) ? data : (data.games || data.matches || data.data || []);
-    if (!games.length) throw new Error('No games in response');
+    const apiIndicator = document.getElementById('api-status');
+    try {
+      // 1. Apelăm API-ul printr-un proxy gratuit pentru a ocoli blocajele CORS de pe telefon
+      const proxyUrl = 'https://api.allorigins.win/get?url=';
+      const targetUrl = encodeURIComponent('https://worldcup26.ir/get/games');
 
-    const idx = buildMatchIndex();
-    let updated = 0;
-    let liveCount = 0;
+      const response = await fetch(proxyUrl + targetUrl);
+      if (!response.ok) throw new Error('HTTP error! status: ' + response.status);
 
-    games.forEach(g => {
-      const t1 = mapTeam(g.home_team || g.homeTeam || g.team1 || '');
-      const t2 = mapTeam(g.away_team || g.awayTeam || g.team2 || '');
-      const s1 = g.home_score ?? g.homeScore ?? g.score1 ?? null;
-      const s2 = g.away_score ?? g.awayScore ?? g.score2 ?? null;
-      const status = (g.status || g.match_status || '').toLowerCase();
+      const proxyData = await response.json();
+      
+      // 2. Proxy-ul pune răspunsul API-ului ca text (string) în proprietatea "contents", deci îl parsăm în JSON
+      const data = JSON.parse(proxyData.contents);
 
-      const key = t1 + '|||' + t2;
-      const mid = idx[key];
-      if (!mid) return;
+      // 3. Extragem meciurile
+      const games = Array.isArray(data) ? data : (data.games || data.matches || data.data || []);
+      if (!games.length) throw new Error('No games in response');
 
-      const isFinished = status.includes('finish') || status.includes('ft') || status.includes('full') || status.includes('ended') || status.includes('completed');
-      const isLive = status.includes('live') || status.includes('progress') || status.includes('1h') || status.includes('2h') || status.includes('ht');
+      const idx = buildMatchIndex();
+      let updated = 0;
+      let liveCount = 0;
 
-      if ((isFinished || isLive) && s1 !== null && s2 !== null) {
-        SCORES[mid].s1 = parseInt(s1);
-        SCORES[mid].s2 = parseInt(s2);
-        SCORES[mid].live = isLive;
-        updated++;
+      // 4. Parcurgem meciurile aduse de API
+      games.forEach(g => {
+        const t1 = mapTeam(g.home_team || g.homeTeam || g.team1);
+        const t2 = mapTeam(g.away_team || g.awayTeam || g.team2);
+        let s1 = g.home_score ?? g.homeScore ?? g.score1;
+        let s2 = g.away_score ?? g.awayScore ?? g.score2;
+        
+        // Dacă API-ul ține scorul direct ca string "2-1" în anumite cazuri
+        if (typeof s1 === 'string' && s1.includes('-')) {
+          const parts = s1.split('-');
+          s1 = parseInt(parts[0]);
+          s2 = parseInt(parts[1]);
+        }
+
+        const mStatus = (g.status || '').toLowerCase();
+        const isLive = mStatus.includes('live') || mStatus.includes('progress') || mStatus.includes('play');
         if (isLive) liveCount++;
+
+        if (t1 && t2 && s1 !== undefined && s2 !== undefined && s1 !== null && s2 !== null) {
+          const key = t1 + '|' + t2;
+          const matchId = idx[key];
+          if (matchId && SCORES[matchId]) {
+            SCORES[matchId].s1 = parseInt(s1);
+            SCORES[matchId].s2 = parseInt(s2);
+            updated++;
+          }
+        }
+      });
+
+      // 5. Actualizăm interfața grafică cu noul status
+      if (apiIndicator) {
+        apiIndicator.textContent = `🟢 API Live · ${updated} meciuri sincronizate ${liveCount ? ' · ' + liveCount + ' LIVE' : ''}`;
+        apiIndicator.style.color = liveCount ? '#dc2626' : '#16a34a';
       }
-    });
+      
+      if (liveCount > 0) {
+        document.getElementById('live-badge').style.display = 'flex';
+      } else {
+        document.getElementById('live-badge').style.display = 'none';
+      }
 
-    if (apiIndicator) {
-      apiIndicator.textContent = `🟢 API live · ${updated} meciuri sincronizate${liveCount ? ' · ' + liveCount + ' LIVE' : ''}`;
-      apiIndicator.style.color = liveCount ? '#dc2626' : '#16a34a';
-    }
-    if (liveCount > 0) {
-      document.getElementById('live-badge').style.display = 'flex';
-    }
+      // Re-render cu datele noi aduse din API
+      renderStandings();
+      renderMatches();
+      const playedNow = Object.values(SCORES).filter(s => s.s1 !== null).length;
+      document.getElementById('subtitle').textContent = `${playedNow} din 72 meciuri jucate · Faza grupelor`;
 
-    // Re-render cu datele noi
-    renderStandings();
-    renderMatches();
-    const playedNow = Object.values(SCORES).filter(s => s.s1 !== null).length;
-    document.getElementById('subtitle').textContent = `${playedNow} din 72 meciuri jucate · Faza grupelor`;
-
-  } catch (err) {
-    console.warn('API error:', err.message);
-    if (apiIndicator) {
-      apiIndicator.textContent = '🟡 Scoruri din Excel (API indisponibil)';
-      apiIndicator.style.color = '#d97706';
+    } catch (err) {
+      console.warn('API error:', err.message);
+      // Fallback: Dacă pică și proxy-ul, punem scorurile din Excel
+      if (apiIndicator) {
+        apiIndicator.textContent = '🟡 Scoruri din Excel (API indisponibil)';
+        apiIndicator.style.color = '#d97706';
+      }
     }
   }
-}
 
 // ═══════════════════════════════════════
 // INIT
