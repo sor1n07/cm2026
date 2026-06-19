@@ -500,10 +500,20 @@ async function fetchLiveScores() {
       const s1 = g.score?.fullTime?.home;
       const s2 = g.score?.fullTime?.away;
 
+      //const status = g.status; 
+      //const isFinished = status === 'FINISHED';
+      //const isLive = status === 'IN_PLAY' || status === 'PAUSED';
+      // ÎNLOCUIEȘTE CU ASTA:
       const status = g.status; 
       const isFinished = status === 'FINISHED';
-      const isLive = status === 'IN_PLAY' || status === 'PAUSED';
+      
+      // Acoperim reprizele, pauza, prelungirile, penalty-urile și o denumire generică 'LIVE'
+      const isLive = ['IN_PLAY', 'PAUSED', 'EXTRA_TIME', 'PENALTY_SHOOTOUT', 'LIVE'].includes(status);
 
+      // DEBUG: Să vedem exact ce status trimite API-ul acum pentru SUA
+      if (t1 === "SUA" || t1 === "United States" || t1 === "USA") {
+          console.log(`Status trimis de API pentru SUA - Australia: [ ${status} ]`);
+      }
       if (isLive) liveCount++;
 
       const mid = idx[t1 + '|' + t2];
