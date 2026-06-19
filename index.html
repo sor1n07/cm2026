@@ -318,17 +318,21 @@ function renderMatches(filter) {
   const container = document.getElementById('matches-list');
   container.innerHTML = '';
 
-  // Sortare strict numerică (1, 2, 3 ... 72)
-  const sortedKeys = Object.keys(SCORES).sort((a, b) => Number(a) - Number(b));
+  // Sortăm meciurile cronologic folosind data din API. 
+  // Dacă API-ul încă nu a încărcat data, folosim ID-ul ca rezervă.
+  const sortedKeys = Object.keys(SCORES).sort((a, b) => {
+    const dateA = SCORES[a].utcDate ? new Date(SCORES[a].utcDate).getTime() : 9999999999999;
+    const dateB = SCORES[b].utcDate ? new Date(SCORES[b].utcDate).getTime() : 9999999999999;
+    if (dateA !== dateB) return dateA - dateB;
+    return parseInt(a) - parseInt(b);
+  });
 
   sortedKeys.forEach(mid => {
     const sc = SCORES[mid];
     const isPlayed = sc.s1 !== null;
-    const isLive = !!LIVE_STATUS[mid];
     
-    // Filtrare (Jucate / În așteptare) — meciurile live apar la "Toate" și "Jucate"
-    if (currentFilter === 'played' && !isPlayed && !isLive) return;
-    if (currentFilter === 'pending' && (isPlayed || isLive)) return;
+    if (currentFilter === 'played' && !isPlayed) return;
+    if (currentFilter === 'pending' && isPlayed) return;
 
     const preds = PREDICTIONS[mid] || {};
     const f1 = FLAGS[sc.team1] || '🏳️';
@@ -345,21 +349,35 @@ function renderMatches(filter) {
       return `<span class="pred-chip ${cls}"><span class="pname">${p}</span> ${pred[0]}-${pred[1]}${pts !== null ? `<span class="pts-tag">${ptsTxt}</span>` : ''}</span>`;
     }).join('');
 
-    const statusHtml = isLive
-      ? `<span class="status s-live">LIVE</span>`
-      : isPlayed
-      ? `<span class="status s-done">Terminat</span>`
-      : `<span class="status s-pending">În așteptare</span>`;
+    // Setăm etichetele pentru LIVE / Terminat / În așteptare
+    let statusHtml = '';
+    if (sc.isLive) {
+      statusHtml = `<span class="status" style="background:#dc2626; color:#fff;">LIVE</span>`;
+    } else if (isPlayed) {
+      statusHtml = `<span class="status s-done">Terminat</span>`;
+    } else {
+      statusHtml = `<span class="status s-pending">În așteptare</span>`;
+    }
 
-    const scoreHtml = (isPlayed || isLive)
-      ? `<span class="score-num${isLive ? ' live-score' : ''}">${sc.s1} — ${sc.s2}</span>`
+    // Formatăm data din API la ora României (ex: Joi, 11.06, 22:00)
+    let matchDateStr = '';
+    if (sc.utcDate) {
+       const d = new Date(sc.utcDate);
+       const options = { timeZone: 'Europe/Bucharest', weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' };
+       // Litera mare la începutul zilei
+       let formattedDate = d.toLocaleString('ro-RO', options);
+       matchDateStr = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
+    }
+
+    const scoreHtml = isPlayed || sc.isLive
+      ? `<span class="score-num">${sc.s1 !== null ? sc.s1 : 0} — ${sc.s2 !== null ? sc.s2 : 0}</span>`
       : `<span class="score-pending">vs</span>`;
 
     const card = document.createElement('div');
-    card.className = 'match-card' + (isLive ? ' live-card' : '');
+    card.className = 'match-card';
     card.innerHTML = `
       <div class="match-head">
-        <span class="match-id">Meci #${mid}</span>
+        <span class="match-id">Meci #${mid} ${matchDateStr ? `<span style="margin-left:8px; color:#888;">🕒 ${matchDateStr}</span>` : ''}</span>
         ${statusHtml}
       </div>
       <div class="match-body">
@@ -376,7 +394,6 @@ function renderMatches(filter) {
     container.appendChild(card);
   });
 }
-
 function filterMatches(filter, btn) {
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
@@ -455,26 +472,15 @@ async function fetchLiveScores() {
   const apiIndicator = document.getElementById('api-status');
   if (apiIndicator) { apiIndicator.textContent = '⏳ Se actualizează...'; apiIndicator.style.color = '#888'; }
   
-  // Aici a fost pus TOKEN-UL TĂU direct în cod:
   const API_KEY = 'ce8fc0d4521c403c80025b5b3d4b2d86'; 
 
   try {
-    if (API_KEY === 'INTRODU_CHEIA_TA_AICI') {
-      throw new Error('API Key lipsă! Actualizează constanta API_KEY în cod.');
-    }
-
-    // URL-ul pentru meciurile de la Campionatul Mondial (Cod: WC)
     const targetUrl = 'https://api.football-data.org/v4/competitions/WC/matches';
-    
-    // Proxy stabil care permite trimiterea cheii API de pe telefon
     const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
 
     const response = await fetch(proxyUrl, {
       method: 'GET',
-      headers: {
-        'X-Auth-Token': API_KEY, // Trimitem cheia ta de acces
-        'Accept': 'application/json'
-      }
+      headers: { 'X-Auth-Token': API_KEY, 'Accept': 'application/json' }
     });
 
     if (!response.ok) throw new Error('HTTP status ' + response.status);
@@ -487,44 +493,37 @@ async function fetchLiveScores() {
     let updated = 0;
     let liveCount = 0;
 
-    // Prelucrăm JSON-ul specific football-data.org
     games.forEach(g => {
-      // Aici numele echipelor se află în obiecte (ex: g.homeTeam.name)
       const t1 = mapTeam(g.homeTeam?.name || g.homeTeam?.shortName || '');
       const t2 = mapTeam(g.awayTeam?.name || g.awayTeam?.shortName || '');
       
-      // Statusul meciului (SCHEDULED, TIMED, IN_PLAY, PAUSED, FINISHED)
+      const s1 = g.score?.fullTime?.home;
+      const s2 = g.score?.fullTime?.away;
+
       const status = g.status; 
       const isFinished = status === 'FINISHED';
       const isLive = status === 'IN_PLAY' || status === 'PAUSED';
 
       if (isLive) liveCount++;
 
-      // Scor live (currentScore) sau final (fullTime)
-      const s1 = isLive
-        ? (g.score?.currentScore?.home ?? g.score?.halfTime?.home ?? g.score?.fullTime?.home)
-        : g.score?.fullTime?.home;
-      const s2 = isLive
-        ? (g.score?.currentScore?.away ?? g.score?.halfTime?.away ?? g.score?.fullTime?.away)
-        : g.score?.fullTime?.away;
+      const mid = idx[t1 + '|' + t2];
+      if (mid && SCORES[mid]) {
+        // Preluăm data exactă din API și o salvăm în obiectul meciului
+        if (g.utcDate) {
+          SCORES[mid].utcDate = g.utcDate;
+        }
+        
+        // Salvăm statusul LIVE pentru a schimba eticheta în roșu
+        SCORES[mid].isLive = isLive;
 
-      // Dacă avem un scor valid, actualizăm dicționarul
-      if ((isFinished || isLive) && s1 !== null && s2 !== null && s1 !== undefined) {
-        const mid = idx[t1 + '|' + t2];
-        if (mid && SCORES[mid]) {
+        if ((isFinished || isLive) && s1 !== null && s2 !== null && s1 !== undefined) {
           SCORES[mid].s1 = s1;
           SCORES[mid].s2 = s2;
-          LIVE_STATUS[mid] = isLive; // marchează ca live
           updated++;
         }
-      } else {
-        // Curăță statusul live dacă meciul s-a terminat/n-a început
-        const mid = idx[t1 + '|' + t2];
-        if (mid) LIVE_STATUS[mid] = false;
       }
     });
 
-    // Actualizăm indicatorul grafic
     if (apiIndicator) {
       apiIndicator.textContent = `🟢 API Live (football-data) · ${updated} meciuri sincronizate (Apasă pt refresh)`;
       apiIndicator.style.color = liveCount > 0 ? '#dc2626' : '#16a34a';
@@ -532,6 +531,7 @@ async function fetchLiveScores() {
     
     document.getElementById('live-badge').style.display = liveCount > 0 ? 'flex' : 'none';
 
+    // Rerandăm cu datele și orele noi
     renderStandings();
     renderMatches();
     const playedNow = Object.values(SCORES).filter(s => s.s1 !== null).length;
@@ -540,13 +540,8 @@ async function fetchLiveScores() {
   } catch (err) {
     console.warn('API error:', err);
     if (apiIndicator) {
-      if (err.message.includes('API Key lipsă')) {
-        apiIndicator.textContent = '🔴 Adaugă cheia API în cod (vezi consola)!';
-        apiIndicator.style.color = '#dc2626';
-      } else {
-        apiIndicator.textContent = '🟡 Scoruri din Excel. (Apasă pt reîncercare)';
-        apiIndicator.style.color = '#d97706';
-      }
+      apiIndicator.textContent = '🟡 Scoruri din Excel. (Apasă pt reîncercare)';
+      apiIndicator.style.color = '#d97706';
     }
   }
 }
