@@ -532,11 +532,22 @@ async function fetchLiveScores() {
         SCORES[mid].isLive = isLive;
 
         if ((isFinished || isLive) && s1 !== null && s2 !== null && s1 !== undefined) {
-          SCORES[mid].s1 = s1;
-          SCORES[mid].s2 = s2;
+          
+          // --- LOGICA NOUĂ: Verificăm dacă echipele sunt inversate ---
+          if (SCORES[mid].team1 === t1) {
+              // Ordinea e identică: salvăm normal
+              SCORES[mid].s1 = s1;
+              SCORES[mid].s2 = s2;
+          } else {
+              // Ordinea e inversată de API: inversăm și noi scorul!
+              SCORES[mid].s1 = s2;
+              SCORES[mid].s2 = s1;
+          }
+          
           updated++;
         }
       }
+
     });
 
     if (apiIndicator) {
