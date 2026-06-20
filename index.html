@@ -461,9 +461,14 @@ function showTab(id) {
 
 function buildMatchIndex() {
   const idx = {};
-  Object.entries(SCORES).forEach(([mid, sc]) => { idx[sc.team1 + '|' + sc.team2] = mid; });
+  Object.entries(SCORES).forEach(([mid, sc]) => { 
+    // Salvăm ambele variante pentru recunoaștere (Gazdă-Oaspete și Oaspete-Gazdă)
+    idx[sc.team1 + '|' + sc.team2] = mid; 
+    idx[sc.team2 + '|' + sc.team1] = mid; 
+  });
   return idx;
 }
+
 
 // ═══════════════════════════════════════
 // API FETCH LIVE - football-data.org
