@@ -161,6 +161,8 @@
   <div id="tab-meciuri" class="section">
     <div class="match-filters">
       <button class="filter-btn active" onclick="filterMatches('all', this)">Toate</button>
+      <button class="filter-btn" onclick="filterMatches('groups', this)">Grupe</button>
+      <button class="filter-btn" onclick="filterMatches('knockout', this)">Faze superioare</button>
       <button class="filter-btn" onclick="filterMatches('played', this)">Jucate</button>
       <button class="filter-btn" onclick="filterMatches('pending', this)">În așteptare</button>
     </div>
@@ -216,9 +218,33 @@ const PARTICIPANTS = ["Dorin","Robert","Silviu","Adrian T","Octavian","Horia","D
 // LIVE status per match (actualizat de API)
 const LIVE_STATUS = {};
 
-const SCORES = {"1":{"team1":"Mexic","team2":"Africa de Sud","s1":2,"s2":0},"2":{"team1":"Coreea de Sud","team2":"Cehia","s1":2,"s2":1},"3":{"team1":"Mexic","team2":"Coreea de Sud","s1":null,"s2":null},"4":{"team1":"Cehia","team2":"Africa de Sud","s1":null,"s2":null},"5":{"team1":"Cehia","team2":"Mexic","s1":null,"s2":null},"6":{"team1":"Africa de Sud","team2":"Coreea de Sud","s1":null,"s2":null},"7":{"team1":"Canada","team2":"Bosnia și Herțegovina","s1":1,"s2":1},"8":{"team1":"Qatar","team2":"Elveția","s1":1,"s2":1},"9":{"team1":"Canada","team2":"Qatar","s1":null,"s2":null},"10":{"team1":"Elveția","team2":"Bosnia și Herțegovina","s1":null,"s2":null},"11":{"team1":"Elveția","team2":"Canada","s1":null,"s2":null},"12":{"team1":"Bosnia și Herțegovina","team2":"Qatar","s1":null,"s2":null},"13":{"team1":"SUA","team2":"Paraguay","s1":4,"s2":1},"14":{"team1":"Australia","team2":"Turcia","s1":2,"s2":0},"15":{"team1":"SUA","team2":"Australia","s1":null,"s2":null},"16":{"team1":"Turcia","team2":"Paraguay","s1":null,"s2":null},"17":{"team1":"Turcia","team2":"SUA","s1":null,"s2":null},"18":{"team1":"Paraguay","team2":"Australia","s1":null,"s2":null},"19":{"team1":"Brazilia","team2":"Maroc","s1":1,"s2":1},"20":{"team1":"Haiti","team2":"Scoția","s1":0,"s2":1},"21":{"team1":"Brazilia","team2":"Haiti","s1":null,"s2":null},"22":{"team1":"Scoția","team2":"Maroc","s1":null,"s2":null},"23":{"team1":"Scoția","team2":"Brazilia","s1":null,"s2":null},"24":{"team1":"Maroc","team2":"Haiti","s1":null,"s2":null},"25":{"team1":"Germania","team2":"Curacao","s1":7,"s2":1},"26":{"team1":"Ecuador","team2":"Coasta de Fildeș","s1":0,"s2":1},"27":{"team1":"Germania","team2":"Ecuador","s1":null,"s2":null},"28":{"team1":"Coasta de Fildeș","team2":"Curacao","s1":null,"s2":null},"29":{"team1":"Coasta de Fildeș","team2":"Germania","s1":null,"s2":null},"30":{"team1":"Curacao","team2":"Ecuador","s1":null,"s2":null},"31":{"team1":"Țările de Jos","team2":"Japonia","s1":2,"s2":2},"32":{"team1":"Suedia","team2":"Tunisia","s1":5,"s2":1},"33":{"team1":"Țările de Jos","team2":"Suedia","s1":null,"s2":null},"34":{"team1":"Tunisia","team2":"Japonia","s1":null,"s2":null},"35":{"team1":"Tunisia","team2":"Țările de Jos","s1":null,"s2":null},"36":{"team1":"Japonia","team2":"Suedia","s1":null,"s2":null},"37":{"team1":"Spania","team2":"Capul Verde","s1":0,"s2":0},"38":{"team1":"Uruguay","team2":"Arabia Saudită","s1":1,"s2":1},"39":{"team1":"Spania","team2":"Uruguay","s1":null,"s2":null},"40":{"team1":"Arabia Saudită","team2":"Capul Verde","s1":null,"s2":null},"41":{"team1":"Arabia Saudită","team2":"Spania","s1":null,"s2":null},"42":{"team1":"Capul Verde","team2":"Uruguay","s1":null,"s2":null},"43":{"team1":"Belgia","team2":"Egipt","s1":1,"s2":1},"44":{"team1":"Noua Zeelandă","team2":"Iran","s1":2,"s2":2},"45":{"team1":"Belgia","team2":"Noua Zeelandă","s1":null,"s2":null},"46":{"team1":"Iran","team2":"Egipt","s1":null,"s2":null},"47":{"team1":"Iran","team2":"Belgia","s1":null,"s2":null},"48":{"team1":"Egipt","team2":"Noua Zeelandă","s1":null,"s2":null},"49":{"team1":"Franța","team2":"Senegal","s1":3,"s2":1},"50":{"team1":"Norvegia","team2":"Irak","s1":4,"s2":1},"51":{"team1":"Franța","team2":"Norvegia","s1":null,"s2":null},"52":{"team1":"Irak","team2":"Senegal","s1":null,"s2":null},"53":{"team1":"Irak","team2":"Franța","s1":null,"s2":null},"54":{"team1":"Senegal","team2":"Norvegia","s1":null,"s2":null},"55":{"team1":"Argentina","team2":"Algeria","s1":3,"s2":0},"56":{"team1":"Iordania","team2":"Austria","s1":1,"s2":3},"57":{"team1":"Argentina","team2":"Iordania","s1":null,"s2":null},"58":{"team1":"Austria","team2":"Algeria","s1":null,"s2":null},"59":{"team1":"Austria","team2":"Argentina","s1":null,"s2":null},"60":{"team1":"Algeria","team2":"Iordania","s1":null,"s2":null},"61":{"team1":"Portugalia","team2":"DR Congo","s1":1,"s2":1},"62":{"team1":"Uzbekistan","team2":"Columbia","s1":1,"s2":3},"63":{"team1":"Portugalia","team2":"Uzbekistan","s1":null,"s2":null},"64":{"team1":"Columbia","team2":"DR Congo","s1":null,"s2":null},"65":{"team1":"Columbia","team2":"Portugalia","s1":null,"s2":null},"66":{"team1":"DR Congo","team2":"Uzbekistan","s1":null,"s2":null},"67":{"team1":"Anglia","team2":"Croația","s1":4,"s2":2},"68":{"team1":"Panama","team2":"Ghana","s1":0,"s2":1},"69":{"team1":"Anglia","team2":"Panama","s1":null,"s2":null},"70":{"team1":"Ghana","team2":"Croația","s1":null,"s2":null},"71":{"team1":"Ghana","team2":"Anglia","s1":null,"s2":null},"72":{"team1":"Croația","team2":"Panama","s1":null,"s2":null}};
+const SCORES = {"1":{"team1":"Mexic","team2":"Africa de Sud","s1":2,"s2":0},"2":{"team1":"Coreea de Sud","team2":"Cehia","s1":2,"s2":1},"3":{"team1":"Mexic","team2":"Coreea de Sud","s1":null,"s2":null},"4":{"team1":"Cehia","team2":"Africa de Sud","s1":null,"s2":null},"5":{"team1":"Cehia","team2":"Mexic","s1":null,"s2":null},"6":{"team1":"Africa de Sud","team2":"Coreea de Sud","s1":null,"s2":null},"7":{"team1":"Canada","team2":"Bosnia și Herțegovina","s1":1,"s2":1},"8":{"team1":"Qatar","team2":"Elveția","s1":1,"s2":1},"9":{"team1":"Canada","team2":"Qatar","s1":null,"s2":null},"10":{"team1":"Elveția","team2":"Bosnia și Herțegovina","s1":null,"s2":null},"11":{"team1":"Elveția","team2":"Canada","s1":null,"s2":null},"12":{"team1":"Bosnia și Herțegovina","team2":"Qatar","s1":null,"s2":null},"13":{"team1":"SUA","team2":"Paraguay","s1":4,"s2":1},"14":{"team1":"Australia","team2":"Turcia","s1":2,"s2":0},"15":{"team1":"SUA","team2":"Australia","s1":null,"s2":null},"16":{"team1":"Turcia","team2":"Paraguay","s1":null,"s2":null},"17":{"team1":"Turcia","team2":"SUA","s1":null,"s2":null},"18":{"team1":"Paraguay","team2":"Australia","s1":null,"s2":null},"19":{"team1":"Brazilia","team2":"Maroc","s1":1,"s2":1},"20":{"team1":"Haiti","team2":"Scoția","s1":0,"s2":1},"21":{"team1":"Brazilia","team2":"Haiti","s1":null,"s2":null},"22":{"team1":"Scoția","team2":"Maroc","s1":null,"s2":null},"23":{"team1":"Scoția","team2":"Brazilia","s1":null,"s2":null},"24":{"team1":"Maroc","team2":"Haiti","s1":null,"s2":null},"25":{"team1":"Germania","team2":"Curacao","s1":7,"s2":1},"26":{"team1":"Ecuador","team2":"Coasta de Fildeș","s1":0,"s2":1},"27":{"team1":"Germania","team2":"Ecuador","s1":null,"s2":null},"28":{"team1":"Coasta de Fildeș","team2":"Curacao","s1":null,"s2":null},"29":{"team1":"Coasta de Fildeș","team2":"Germania","s1":null,"s2":null},"30":{"team1":"Curacao","team2":"Ecuador","s1":null,"s2":null},"31":{"team1":"Țările de Jos","team2":"Japonia","s1":2,"s2":2},"32":{"team1":"Suedia","team2":"Tunisia","s1":5,"s2":1},"33":{"team1":"Țările de Jos","team2":"Suedia","s1":null,"s2":null},"34":{"team1":"Tunisia","team2":"Japonia","s1":null,"s2":null},"35":{"team1":"Tunisia","team2":"Țările de Jos","s1":null,"s2":null},"36":{"team1":"Japonia","team2":"Suedia","s1":null,"s2":null},"37":{"team1":"Spania","team2":"Capul Verde","s1":0,"s2":0},"38":{"team1":"Uruguay","team2":"Arabia Saudită","s1":1,"s2":1},"39":{"team1":"Spania","team2":"Uruguay","s1":null,"s2":null},"40":{"team1":"Arabia Saudită","team2":"Capul Verde","s1":null,"s2":null},"41":{"team1":"Arabia Saudită","team2":"Spania","s1":null,"s2":null},"42":{"team1":"Capul Verde","team2":"Uruguay","s1":null,"s2":null},"43":{"team1":"Belgia","team2":"Egipt","s1":1,"s2":1},"44":{"team1":"Noua Zeelandă","team2":"Iran","s1":2,"s2":2},"45":{"team1":"Belgia","team2":"Noua Zeelandă","s1":null,"s2":null},"46":{"team1":"Iran","team2":"Egipt","s1":null,"s2":null},"47":{"team1":"Iran","team2":"Belgia","s1":null,"s2":null},"48":{"team1":"Egipt","team2":"Noua Zeelandă","s1":null,"s2":null},"49":{"team1":"Franța","team2":"Senegal","s1":3,"s2":1},"50":{"team1":"Norvegia","team2":"Irak","s1":4,"s2":1},"51":{"team1":"Franța","team2":"Norvegia","s1":null,"s2":null},"52":{"team1":"Irak","team2":"Senegal","s1":null,"s2":null},"53":{"team1":"Irak","team2":"Franța","s1":null,"s2":null},"54":{"team1":"Senegal","team2":"Norvegia","s1":null,"s2":null},"55":{"team1":"Argentina","team2":"Algeria","s1":3,"s2":0},"56":{"team1":"Iordania","team2":"Austria","s1":1,"s2":3},"57":{"team1":"Argentina","team2":"Iordania","s1":null,"s2":null},"58":{"team1":"Austria","team2":"Algeria","s1":null,"s2":null},"59":{"team1":"Austria","team2":"Argentina","s1":null,"s2":null},"60":{"team1":"Algeria","team2":"Iordania","s1":null,"s2":null},"61":{"team1":"Portugalia","team2":"DR Congo","s1":1,"s2":1},"62":{"team1":"Uzbekistan","team2":"Columbia","s1":1,"s2":3},"63":{"team1":"Portugalia","team2":"Uzbekistan","s1":null,"s2":null},"64":{"team1":"Columbia","team2":"DR Congo","s1":null,"s2":null},"65":{"team1":"Columbia","team2":"Portugalia","s1":null,"s2":null},"66":{"team1":"DR Congo","team2":"Uzbekistan","s1":null,"s2":null},"67":{"team1":"Anglia","team2":"Croația","s1":4,"s2":2},"68":{"team1":"Panama","team2":"Ghana","s1":0,"s2":1},"69":{"team1":"Anglia","team2":"Panama","s1":null,"s2":null},"70":{"team1":"Ghana","team2":"Croația","s1":null,"s2":null},"71":{"team1":"Ghana","team2":"Anglia","s1":null,"s2":null},"72":{"team1":"Croația","team2":"Panama","s1":null,"s2":null}
+,"73":{"team1":"Africa de Sud","team2":"Canada","s1":null,"s2":null,"stage":"Optimi","apiId":null}
+,"74":{"team1":"?","team2":"?","s1":null,"s2":null,"stage":"Optimi","apiId":null}
+,"75":{"team1":"?","team2":"?","s1":null,"s2":null,"stage":"Optimi","apiId":null}
+,"76":{"team1":"?","team2":"?","s1":null,"s2":null,"stage":"Optimi","apiId":null}
+,"77":{"team1":"?","team2":"?","s1":null,"s2":null,"stage":"Optimi","apiId":null}
+,"78":{"team1":"?","team2":"?","s1":null,"s2":null,"stage":"Optimi","apiId":null}
+,"79":{"team1":"?","team2":"?","s1":null,"s2":null,"stage":"Optimi","apiId":null}
+,"80":{"team1":"?","team2":"?","s1":null,"s2":null,"stage":"Optimi","apiId":null}
+,"81":{"team1":"?","team2":"?","s1":null,"s2":null,"stage":"Optimi","apiId":null}
+,"82":{"team1":"?","team2":"?","s1":null,"s2":null,"stage":"Optimi","apiId":null}
+,"83":{"team1":"?","team2":"?","s1":null,"s2":null,"stage":"Optimi","apiId":null}
+,"84":{"team1":"?","team2":"?","s1":null,"s2":null,"stage":"Optimi","apiId":null}
+,"85":{"team1":"?","team2":"?","s1":null,"s2":null,"stage":"Optimi","apiId":null}
+,"86":{"team1":"?","team2":"?","s1":null,"s2":null,"stage":"Optimi","apiId":null}
+,"87":{"team1":"?","team2":"?","s1":null,"s2":null,"stage":"Optimi","apiId":null}
+,"88":{"team1":"?","team2":"?","s1":null,"s2":null,"stage":"Optimi","apiId":null}
+,"89":{"team1":"?","team2":"?","s1":null,"s2":null,"stage":"Sferturi","apiId":null}
+,"90":{"team1":"?","team2":"?","s1":null,"s2":null,"stage":"Sferturi","apiId":null}
+,"91":{"team1":"?","team2":"?","s1":null,"s2":null,"stage":"Sferturi","apiId":null}
+,"92":{"team1":"?","team2":"?","s1":null,"s2":null,"stage":"Sferturi","apiId":null}
+,"93":{"team1":"?","team2":"?","s1":null,"s2":null,"stage":"Semifinale","apiId":null}
+,"94":{"team1":"?","team2":"?","s1":null,"s2":null,"stage":"Semifinale","apiId":null}
+,"95":{"team1":"?","team2":"?","s1":null,"s2":null,"stage":"Finala mică","apiId":null}
+,"96":{"team1":"?","team2":"?","s1":null,"s2":null,"stage":"Finală","apiId":null}};
 
-const PREDICTIONS = {"1":{"Dorin":[2,0],"Robert":[2,0],"Silviu":[3,1],"Adrian T":[2,1],"Octavian":[2,0],"Horia":[2,1],"Doru":[1,1],"Sorin":[2,0],"Cristi":[1,0],"Paul":[2,1],"Ciprian":[3,1],"Florin B":[3,2],"Sebastian":[1,0]},"2":{"Dorin":[1,1],"Robert":[1,2],"Silviu":[0,1],"Adrian T":[1,1],"Octavian":[1,1],"Horia":[1,2],"Doru":[2,3],"Sorin":[1,1],"Cristi":[2,2],"Paul":[2,1],"Ciprian":[1,3],"Florin B":[1,0],"Sebastian":[0,0]},"3":{"Dorin":[2,1],"Robert":[2,1],"Silviu":[2,0],"Adrian T":[1,1],"Octavian":[1,0],"Horia":[1,0],"Doru":[0,2],"Sorin":[1,0],"Cristi":[2,1],"Paul":[1,1],"Ciprian":[2,1],"Florin B":[1,1],"Sebastian":[2,1]},"4":{"Dorin":[2,1],"Robert":[1,1],"Silviu":[1,1],"Adrian T":[2,0],"Octavian":[0,1],"Horia":[2,0],"Doru":[2,2],"Sorin":[2,0],"Cristi":[2,1],"Paul":[1,0],"Ciprian":[4,0],"Florin B":[1,1],"Sebastian":[2,0]},"5":{"Dorin":[1,2],"Robert":[1,1],"Silviu":[0,0],"Adrian T":[1,1],"Octavian":[1,3],"Horia":[1,1],"Doru":[2,0],"Sorin":[1,1],"Cristi":[1,1],"Paul":[0,2],"Ciprian":[2,2],"Florin B":[0,0],"Sebastian":[1,2]},"6":{"Dorin":[1,2],"Robert":[1,1],"Silviu":[1,1],"Adrian T":[0,3],"Octavian":[0,2],"Horia":[0,1],"Doru":[1,2],"Sorin":[0,0],"Cristi":[1,1],"Paul":[0,1],"Ciprian":[1,3],"Florin B":[0,1],"Sebastian":[0,1]},"7":{"Dorin":[2,1],"Robert":[1,2],"Silviu":[0,0],"Adrian T":[2,0],"Octavian":[0,1],"Horia":[2,2],"Doru":[1,1],"Sorin":[1,0],"Cristi":[1,1],"Paul":[1,1],"Ciprian":[1,1],"Florin B":[1,0],"Sebastian":[2,1]},"8":{"Dorin":[1,3],"Robert":[0,2],"Silviu":[0,2],"Adrian T":[0,4],"Octavian":[2,2],"Horia":[0,2],"Doru":[0,2],"Sorin":[0,3],"Cristi":[0,2],"Paul":[0,2],"Ciprian":[1,3],"Florin B":[0,2],"Sebastian":[1,3]},"9":{"Dorin":[2,1],"Robert":[2,0],"Silviu":[3,0],"Adrian T":[2,0],"Octavian":[1,0],"Horia":[3,0],"Doru":[2,1],"Sorin":[2,0],"Cristi":[3,0],"Paul":[2,0],"Ciprian":[3,1],"Florin B":[2,1],"Sebastian":[3,0]},"10":{"Dorin":[2,0],"Robert":[1,1],"Silviu":[1,1],"Adrian T":[2,0],"Octavian":[1,0],"Horia":[1,0],"Doru":[3,2],"Sorin":[1,0],"Cristi":[2,1],"Paul":[1,1],"Ciprian":[1,2],"Florin B":[1,1],"Sebastian":[1,0]},"11":{"Dorin":[1,1],"Robert":[2,0],"Silviu":[1,2],"Adrian T":[1,1],"Octavian":[0,2],"Horia":[1,1],"Doru":[2,0],"Sorin":[1,0],"Cristi":[3,1],"Paul":[0,0],"Ciprian":[2,1],"Florin B":[1,1],"Sebastian":[1,0]},"12":{"Dorin":[2,1],"Robert":[2,0],"Silviu":[2,1],"Adrian T":[2,0],"Octavian":[2,1],"Horia":[3,0],"Doru":[1,0],"Sorin":[2,0],"Cristi":[2,0],"Paul":[2,0],"Ciprian":[3,0],"Florin B":[1,0],"Sebastian":[3,2]},"13":{"Dorin":[2,0],"Robert":[1,1],"Silviu":[4,0],"Adrian T":[1,0],"Octavian":[2,0],"Horia":[2,1],"Doru":[0,0],"Sorin":[2,0],"Cristi":[1,0],"Paul":[2,1],"Ciprian":[0,3],"Florin B":[2,1],"Sebastian":[2,1]},"14":{"Dorin":[1,1],"Robert":[1,2],"Silviu":[1,2],"Adrian T":[0,2],"Octavian":[0,3],"Horia":[1,2],"Doru":[1,1],"Sorin":[0,2],"Cristi":[1,3],"Paul":[1,2],"Ciprian":[0,2],"Florin B":[0,1],"Sebastian":[0,2]},"15":{"Dorin":[2,1],"Robert":[2,0],"Silviu":[2,1],"Adrian T":[2,1],"Octavian":[0,0],"Horia":[3,3],"Doru":[0,2],"Sorin":[2,0],"Cristi":[2,1],"Paul":[2,0],"Ciprian":[2,0],"Florin B":[3,2],"Sebastian":[3,2]},"16":{"Dorin":[2,1],"Robert":[1,1],"Silviu":[3,0],"Adrian T":[2,0],"Octavian":[0,1],"Horia":[2,0],"Doru":[2,2],"Sorin":[2,0],"Cristi":[2,1],"Paul":[1,0],"Ciprian":[1,2],"Florin B":[1,1],"Sebastian":[2,1]},"17":{"Dorin":[1,2],"Robert":[1,1],"Silviu":[1,0],"Adrian T":[1,1],"Octavian":[1,1],"Horia":[2,1],"Doru":[1,2],"Sorin":[1,1],"Cristi":[2,2],"Paul":[2,2],"Ciprian":[3,1],"Florin B":[1,1],"Sebastian":[1,1]},"18":{"Dorin":[1,2],"Robert":[2,1],"Silviu":[0,2],"Adrian T":[1,1],"Octavian":[4,0],"Horia":[0,1],"Doru":[2,1],"Sorin":[1,1],"Cristi":[1,1],"Paul":[2,2],"Ciprian":[1,1],"Florin B":[2,2],"Sebastian":[1,0]},"19":{"Dorin":[2,1],"Robert":[2,0],"Silviu":[2,1],"Adrian T":[2,1],"Octavian":[2,2],"Horia":[2,0],"Doru":[1,2],"Sorin":[2,1],"Cristi":[2,2],"Paul":[4,0],"Ciprian":[3,0],"Florin B":[2,0],"Sebastian":[3,1]},"20":{"Dorin":[0,2],"Robert":[0,2],"Silviu":[0,1],"Adrian T":[0,2],"Octavian":[0,3],"Horia":[0,2],"Doru":[1,2],"Sorin":[0,3],"Cristi":[0,2],"Paul":[0,2],"Ciprian":[0,4],"Florin B":[0,2],"Sebastian":[0,2]},"21":{"Dorin":[3,0],"Robert":[4,0],"Silviu":[4,0],"Adrian T":[6,0],"Octavian":[4,1],"Horia":[6,0],"Doru":[2,0],"Sorin":[3,0],"Cristi":[4,0],"Paul":[5,0],"Ciprian":[5,0],"Florin B":[4,0],"Sebastian":[3,0]},"22":{"Dorin":[1,2],"Robert":[1,1],"Silviu":[1,2],"Adrian T":[1,1],"Octavian":[0,2],"Horia":[1,1],"Doru":[0,1],"Sorin":[1,1],"Cristi":[0,1],"Paul":[1,1],"Ciprian":[1,1],"Florin B":[1,1],"Sebastian":[0,1]},"23":{"Dorin":[0,2],"Robert":[1,2],"Silviu":[0,1],"Adrian T":[0,2],"Octavian":[1,1],"Horia":[0,2],"Doru":[0,2],"Sorin":[0,2],"Cristi":[1,2],"Paul":[0,3],"Ciprian":[1,4],"Florin B":[1,2],"Sebastian":[1,2]},"24":{"Dorin":[3,0],"Robert":[2,0],"Silviu":[3,0],"Adrian T":[4,0],"Octavian":[5,0],"Horia":[2,0],"Doru":[1,0],"Sorin":[3,0],"Cristi":[3,0],"Paul":[3,0],"Ciprian":[1,1],"Florin B":[3,0],"Sebastian":[2,0]},"25":{"Dorin":[3,0],"Robert":[4,0],"Silviu":[5,0],"Adrian T":[6,0],"Octavian":[6,1],"Horia":[4,0],"Doru":[3,1],"Sorin":[5,0],"Cristi":[5,0],"Paul":[3,0],"Ciprian":[3,0],"Florin B":[5,0],"Sebastian":[4,0]},"26":{"Dorin":[1,1],"Robert":[1,1],"Silviu":[0,1],"Adrian T":[1,1],"Octavian":[1,2],"Horia":[1,1],"Doru":[1,2],"Sorin":[1,1],"Cristi":[1,2],"Paul":[2,2],"Ciprian":[2,1],"Florin B":[1,1],"Sebastian":[2,1]},"27":{"Dorin":[2,0],"Robert":[2,0],"Silviu":[3,1],"Adrian T":[2,0],"Octavian":[3,0],"Horia":[3,1],"Doru":[2,0],"Sorin":[2,0],"Cristi":[3,1],"Paul":[3,1],"Ciprian":[3,2],"Florin B":[2,0],"Sebastian":[3,1]},"28":{"Dorin":[2,0],"Robert":[2,1],"Silviu":[3,1],"Adrian T":[3,0],"Octavian":[1,0],"Horia":[2,0],"Doru":[2,0],"Sorin":[3,0],"Cristi":[3,1],"Paul":[3,0],"Ciprian":[2,1],"Florin B":[2,0],"Sebastian":[1,0]},"29":{"Dorin":[0,2],"Robert":[1,3],"Silviu":[3,3],"Adrian T":[1,2],"Octavian":[1,2],"Horia":[1,3],"Doru":[2,3],"Sorin":[1,3],"Cristi":[1,1],"Paul":[1,3],"Ciprian":[1,2],"Florin B":[1,3],"Sebastian":[1,3]},"30":{"Dorin":[0,2],"Robert":[1,2],"Silviu":[2,0],"Adrian T":[0,3],"Octavian":[1,0],"Horia":[0,1],"Doru":[1,2],"Sorin":[0,3],"Cristi":[0,1],"Paul":[0,3],"Ciprian":[1,4],"Florin B":[0,3],"Sebastian":[0,2]},"31":{"Dorin":[2,1],"Robert":[2,0],"Silviu":[1,1],"Adrian T":[2,2],"Octavian":[1,1],"Horia":[1,0],"Doru":[0,0],"Sorin":[2,1],"Cristi":[2,2],"Paul":[3,1],"Ciprian":[3,1],"Florin B":[2,1],"Sebastian":[1,0]},"32":{"Dorin":[1,1],"Robert":[1,1],"Silviu":[2,1],"Adrian T":[3,1],"Octavian":[1,1],"Horia":[2,1],"Doru":[1,2],"Sorin":[1,0],"Cristi":[2,0],"Paul":[2,2],"Ciprian":[2,1],"Florin B":[2,0],"Sebastian":[2,0]},"33":{"Dorin":[2,0],"Robert":[2,1],"Silviu":[1,0],"Adrian T":[1,1],"Octavian":[2,3],"Horia":[1,2],"Doru":[1,2],"Sorin":[2,0],"Cristi":[1,1],"Paul":[3,1],"Ciprian":[2,2],"Florin B":[1,1],"Sebastian":[2,1]},"34":{"Dorin":[1,2],"Robert":[1,1],"Silviu":[1,2],"Adrian T":[1,2],"Octavian":[2,3],"Horia":[1,2],"Doru":[2,3],"Sorin":[0,1],"Cristi":[1,2],"Paul":[1,3],"Ciprian":[1,3],"Florin B":[1,2],"Sebastian":[0,1]},"35":{"Dorin":[0,2],"Robert":[1,2],"Silviu":[1,2],"Adrian T":[0,2],"Octavian":[2,2],"Horia":[0,2],"Doru":[2,2],"Sorin":[0,2],"Cristi":[0,3],"Paul":[0,3],"Ciprian":[0,3],"Florin B":[1,3],"Sebastian":[0,2]},"36":{"Dorin":[2,1],"Robert":[1,1],"Silviu":[1,1],"Adrian T":[1,1],"Octavian":[1,1],"Horia":[0,1],"Doru":[1,2],"Sorin":[1,1],"Cristi":[2,1],"Paul":[2,2],"Ciprian":[1,1],"Florin B":[1,1],"Sebastian":[1,0]},"37":{"Dorin":[3,0],"Robert":[3,0],"Silviu":[4,1],"Adrian T":[5,0],"Octavian":[5,1],"Horia":[4,0],"Doru":[2,0],"Sorin":[4,0],"Cristi":[4,0],"Paul":[5,0],"Ciprian":[6,0],"Florin B":[4,0],"Sebastian":[3,0]},"38":{"Dorin":[2,0],"Robert":[2,0],"Silviu":[2,1],"Adrian T":[2,1],"Octavian":[1,1],"Horia":[3,0],"Doru":[1,1],"Sorin":[4,0],"Cristi":[2,0],"Paul":[3,0],"Ciprian":[4,1],"Florin B":[1,1],"Sebastian":[2,1]},"39":{"Dorin":[2,1],"Robert":[1,1],"Silviu":[3,1],"Adrian T":[2,0],"Octavian":[1,0],"Horia":[2,1],"Doru":[2,1],"Sorin":[2,0],"Cristi":[1,0],"Paul":[3,1],"Ciprian":[3,2],"Florin B":[2,1],"Sebastian":[2,1]},"40":{"Dorin":[2,1],"Robert":[1,1],"Silviu":[2,0],"Adrian T":[2,0],"Octavian":[2,1],"Horia":[1,0],"Doru":[1,2],"Sorin":[1,1],"Cristi":[1,2],"Paul":[2,0],"Ciprian":[1,1],"Florin B":[1,0],"Sebastian":[2,2]},"41":{"Dorin":[0,3],"Robert":[1,2],"Silviu":[0,3],"Adrian T":[1,4],"Octavian":[0,1],"Horia":[0,3],"Doru":[0,1],"Sorin":[0,4],"Cristi":[0,2],"Paul":[0,5],"Ciprian":[1,3],"Florin B":[1,1],"Sebastian":[0,2]},"42":{"Dorin":[0,3],"Robert":[1,2],"Silviu":[0,1],"Adrian T":[0,3],"Octavian":[0,3],"Horia":[0,2],"Doru":[2,1],"Sorin":[0,2],"Cristi":[1,2],"Paul":[0,5],"Ciprian":[1,2],"Florin B":[0,2],"Sebastian":[0,2]},"43":{"Dorin":[3,0],"Robert":[2,0],"Silviu":[1,0],"Adrian T":[2,0],"Octavian":[1,1],"Horia":[2,1],"Doru":[2,2],"Sorin":[2,0],"Cristi":[2,1],"Paul":[3,1],"Ciprian":[3,1],"Florin B":[2,1],"Sebastian":[2,0]},"44":{"Dorin":[1,2],"Robert":[1,1],"Silviu":[1,2],"Adrian T":[0,1],"Octavian":[0,2],"Horia":[0,1],"Doru":[0,1],"Sorin":[0,0],"Cristi":[1,1],"Paul":[1,3],"Ciprian":[2,1],"Florin B":[1,1],"Sebastian":[0,1]},"45":{"Dorin":[3,0],"Robert":[2,0],"Silviu":[3,0],"Adrian T":[4,0],"Octavian":[3,1],"Horia":[3,0],"Doru":[2,1],"Sorin":[2,0],"Cristi":[2,0],"Paul":[3,0],"Ciprian":[3,1],"Florin B":[3,0],"Sebastian":[2,0]},"46":{"Dorin":[1,1],"Robert":[0,1],"Silviu":[1,1],"Adrian T":[1,2],"Octavian":[2,0],"Horia":[1,1],"Doru":[1,2],"Sorin":[0,1],"Cristi":[0,0],"Paul":[2,2],"Ciprian":[1,1],"Florin B":[0,1],"Sebastian":[0,1]},"47":{"Dorin":[0,3],"Robert":[0,2],"Silviu":[1,2],"Adrian T":[0,3],"Octavian":[0,1],"Horia":[1,2],"Doru":[0,1],"Sorin":[0,2],"Cristi":[0,1],"Paul":[1,3],"Ciprian":[0,3],"Florin B":[0,2],"Sebastian":[0,2]},"48":{"Dorin":[2,1],"Robert":[2,1],"Silviu":[1,0],"Adrian T":[2,0],"Octavian":[1,1],"Horia":[2,0],"Doru":[1,1],"Sorin":[2,0],"Cristi":[2,2],"Paul":[2,0],"Ciprian":[2,1],"Florin B":[1,0],"Sebastian":[1,0]},"49":{"Dorin":[2,1],"Robert":[2,0],"Silviu":[3,0],"Adrian T":[2,0],"Octavian":[2,1],"Horia":[3,0],"Doru":[2,1],"Sorin":[2,0],"Cristi":[3,2],"Paul":[2,1],"Ciprian":[2,3],"Florin B":[3,1],"Sebastian":[2,1]},"50":{"Dorin":[2,0],"Robert":[1,1],"Silviu":[2,0],"Adrian T":[3,0],"Octavian":[3,0],"Horia":[3,0],"Doru":[1,0],"Sorin":[3,0],"Cristi":[3,0],"Paul":[2,0],"Ciprian":[3,0],"Florin B":[4,0],"Sebastian":[2,0]},"51":{"Dorin":[2,1],"Robert":[2,1],"Silviu":[2,2],"Adrian T":[1,1],"Octavian":[1,1],"Horia":[2,1],"Doru":[2,1],"Sorin":[1,1],"Cristi":[2,1],"Paul":[2,2],"Ciprian":[2,1],"Florin B":[1,1],"Sebastian":[3,1]},"52":{"Dorin":[0,2],"Robert":[1,1],"Silviu":[0,2],"Adrian T":[0,1],"Octavian":[1,0],"Horia":[0,1],"Doru":[0,1],"Sorin":[0,2],"Cristi":[0,1],"Paul":[0,3],"Ciprian":[1,3],"Florin B":[0,1],"Sebastian":[0,2]},"53":{"Dorin":[0,2],"Robert":[0,3],"Silviu":[0,3],"Adrian T":[0,4],"Octavian":[0,3],"Horia":[0,3],"Doru":[1,3],"Sorin":[0,3],"Cristi":[0,3],"Paul":[0,5],"Ciprian":[0,4],"Florin B":[0,3],"Sebastian":[0,2]},"54":{"Dorin":[2,1],"Robert":[1,1],"Silviu":[0,2],"Adrian T":[1,3],"Octavian":[1,1],"Horia":[0,1],"Doru":[1,1],"Sorin":[1,2],"Cristi":[1,2],"Paul":[2,2],"Ciprian":[1,3],"Florin B":[1,3],"Sebastian":[0,1]},"55":{"Dorin":[2,0],"Robert":[2,0],"Silviu":[4,0],"Adrian T":[2,0],"Octavian":[2,0],"Horia":[2,0],"Doru":[0,2],"Sorin":[3,0],"Cristi":[1,0],"Paul":[3,0],"Ciprian":[4,1],"Florin B":[1,1],"Sebastian":[3,0]},"56":{"Dorin":[0,2],"Robert":[0,2],"Silviu":[0,2],"Adrian T":[0,1],"Octavian":[0,1],"Horia":[0,2],"Doru":[0,1],"Sorin":[0,2],"Cristi":[0,1],"Paul":[1,2],"Ciprian":[1,3],"Florin B":[0,2],"Sebastian":[0,2]},"57":{"Dorin":[3,0],"Robert":[2,0],"Silviu":[4,0],"Adrian T":[3,0],"Octavian":[5,0],"Horia":[3,0],"Doru":[2,0],"Sorin":[2,0],"Cristi":[3,0],"Paul":[3,0],"Ciprian":[5,1],"Florin B":[2,0],"Sebastian":[3,0]},"58":{"Dorin":[1,1],"Robert":[3,0],"Silviu":[1,0],"Adrian T":[1,1],"Octavian":[0,2],"Horia":[3,1],"Doru":[1,2],"Sorin":[2,0],"Cristi":[1,1],"Paul":[2,1],"Ciprian":[3,2],"Florin B":[1,1],"Sebastian":[2,1]},"59":{"Dorin":[0,2],"Robert":[0,2],"Silviu":[1,0],"Adrian T":[0,3],"Octavian":[1,3],"Horia":[2,3],"Doru":[1,1],"Sorin":[1,1],"Cristi":[0,1],"Paul":[1,3],"Ciprian":[1,3],"Florin B":[1,1],"Sebastian":[1,2]},"60":{"Dorin":[2,0],"Robert":[1,1],"Silviu":[0,0],"Adrian T":[2,0],"Octavian":[3,0],"Horia":[2,0],"Doru":[2,1],"Sorin":[0,0],"Cristi":[2,0],"Paul":[2,1],"Ciprian":[1,1],"Florin B":[1,0],"Sebastian":[1,0]},"61":{"Dorin":[3,0],"Robert":[2,0],"Silviu":[3,0],"Adrian T":[4,0],"Octavian":[3,0],"Horia":[2,0],"Doru":[2,0],"Sorin":[3,0],"Cristi":[4,2],"Paul":[2,0],"Ciprian":[2,1],"Florin B":[1,0],"Sebastian":[3,1]},"62":{"Dorin":[0,2],"Robert":[1,3],"Silviu":[0,1],"Adrian T":[0,3],"Octavian":[0,2],"Horia":[0,2],"Doru":[0,2],"Sorin":[0,2],"Cristi":[1,3],"Paul":[0,2],"Ciprian":[2,2],"Florin B":[0,2],"Sebastian":[0,2]},"63":{"Dorin":[3,0],"Robert":[3,1],"Silviu":[2,1],"Adrian T":[3,0],"Octavian":[7,0],"Horia":[3,0],"Doru":[2,0],"Sorin":[2,0],"Cristi":[3,0],"Paul":[3,0],"Ciprian":[2,1],"Florin B":[2,0],"Sebastian":[2,0]},"64":{"Dorin":[3,0],"Robert":[1,0],"Silviu":[2,0],"Adrian T":[2,0],"Octavian":[2,2],"Horia":[3,1],"Doru":[2,1],"Sorin":[2,0],"Cristi":[3,2],"Paul":[3,1],"Ciprian":[3,1],"Florin B":[1,1],"Sebastian":[2,0]},"65":{"Dorin":[1,2],"Robert":[1,1],"Silviu":[2,2],"Adrian T":[1,1],"Octavian":[0,1],"Horia":[3,4],"Doru":[0,2],"Sorin":[1,1],"Cristi":[2,2],"Paul":[1,3],"Ciprian":[1,1],"Florin B":[2,2],"Sebastian":[2,2]},"66":{"Dorin":[1,2],"Robert":[1,1],"Silviu":[1,2],"Adrian T":[1,1],"Octavian":[2,1],"Horia":[0,1],"Doru":[3,1],"Sorin":[1,0],"Cristi":[1,0],"Paul":[2,2],"Ciprian":[1,2],"Florin B":[1,0],"Sebastian":[0,0]},"67":{"Dorin":[2,1],"Robert":[1,1],"Silviu":[1,1],"Adrian T":[2,1],"Octavian":[0,2],"Horia":[2,1],"Doru":[2,2],"Sorin":[2,0],"Cristi":[2,0],"Paul":[1,0],"Ciprian":[2,3],"Florin B":[1,0],"Sebastian":[1,0]},"68":{"Dorin":[1,2],"Robert":[1,2],"Silviu":[1,2],"Adrian T":[0,1],"Octavian":[2,2],"Horia":[1,2],"Doru":[1,2],"Sorin":[0,1],"Cristi":[0,1],"Paul":[0,1],"Ciprian":[1,2],"Florin B":[1,1],"Sebastian":[1,1]},"69":{"Dorin":[3,0],"Robert":[2,1],"Silviu":[3,0],"Adrian T":[3,0],"Octavian":[2,0],"Horia":[2,0],"Doru":[1,0],"Sorin":[3,0],"Cristi":[5,0],"Paul":[4,0],"Ciprian":[3,1],"Florin B":[2,0],"Sebastian":[2,0]},"70":{"Dorin":[1,2],"Robert":[1,1],"Silviu":[0,1],"Adrian T":[1,1],"Octavian":[1,1],"Horia":[1,2],"Doru":[2,3],"Sorin":[1,2],"Cristi":[1,2],"Paul":[2,2],"Ciprian":[1,2],"Florin B":[1,2],"Sebastian":[1,2]},"71":{"Dorin":[0,2],"Robert":[1,3],"Silviu":[1,1],"Adrian T":[0,2],"Octavian":[1,0],"Horia":[1,2],"Doru":[2,2],"Sorin":[0,2],"Cristi":[0,1],"Paul":[1,3],"Ciprian":[1,4],"Florin B":[1,1],"Sebastian":[1,2]},"72":{"Dorin":[2,0],"Robert":[1,0],"Silviu":[3,0],"Adrian T":[2,0],"Octavian":[2,0],"Horia":[3,0],"Doru":[0,1],"Sorin":[2,0],"Cristi":[3,0],"Paul":[2,0],"Ciprian":[2,1],"Florin B":[2,0],"Sebastian":[2,0]}};
+const PREDICTIONS = {"1":{"Dorin":[2,0],"Robert":[2,0],"Silviu":[3,1],"Adrian T":[2,1],"Octavian":[2,0],"Horia":[2,1],"Doru":[1,1],"Sorin":[2,0],"Cristi":[1,0],"Paul":[2,1],"Ciprian":[3,1],"Florin B":[3,2],"Sebastian":[1,0]},"2":{"Dorin":[1,1],"Robert":[1,2],"Silviu":[0,1],"Adrian T":[1,1],"Octavian":[1,1],"Horia":[1,2],"Doru":[2,3],"Sorin":[1,1],"Cristi":[2,2],"Paul":[2,1],"Ciprian":[1,3],"Florin B":[1,0],"Sebastian":[0,0]},"3":{"Dorin":[2,1],"Robert":[2,1],"Silviu":[2,0],"Adrian T":[1,1],"Octavian":[1,0],"Horia":[1,0],"Doru":[0,2],"Sorin":[1,0],"Cristi":[2,1],"Paul":[1,1],"Ciprian":[2,1],"Florin B":[1,1],"Sebastian":[2,1]},"4":{"Dorin":[2,1],"Robert":[1,1],"Silviu":[1,1],"Adrian T":[2,0],"Octavian":[0,1],"Horia":[2,0],"Doru":[2,2],"Sorin":[2,0],"Cristi":[2,1],"Paul":[1,0],"Ciprian":[4,0],"Florin B":[1,1],"Sebastian":[2,0]},"5":{"Dorin":[1,2],"Robert":[1,1],"Silviu":[0,0],"Adrian T":[1,1],"Octavian":[1,3],"Horia":[1,1],"Doru":[2,0],"Sorin":[1,1],"Cristi":[1,1],"Paul":[0,2],"Ciprian":[2,2],"Florin B":[0,0],"Sebastian":[1,2]},"6":{"Dorin":[1,2],"Robert":[1,1],"Silviu":[1,1],"Adrian T":[0,3],"Octavian":[0,2],"Horia":[0,1],"Doru":[1,2],"Sorin":[0,0],"Cristi":[1,1],"Paul":[0,1],"Ciprian":[1,3],"Florin B":[0,1],"Sebastian":[0,1]},"7":{"Dorin":[2,1],"Robert":[1,2],"Silviu":[0,0],"Adrian T":[2,0],"Octavian":[0,1],"Horia":[2,2],"Doru":[1,1],"Sorin":[1,0],"Cristi":[1,1],"Paul":[1,1],"Ciprian":[1,1],"Florin B":[1,0],"Sebastian":[2,1]},"8":{"Dorin":[1,3],"Robert":[0,2],"Silviu":[0,2],"Adrian T":[0,4],"Octavian":[2,2],"Horia":[0,2],"Doru":[0,2],"Sorin":[0,3],"Cristi":[0,2],"Paul":[0,2],"Ciprian":[1,3],"Florin B":[0,2],"Sebastian":[1,3]},"9":{"Dorin":[2,1],"Robert":[2,0],"Silviu":[3,0],"Adrian T":[2,0],"Octavian":[1,0],"Horia":[3,0],"Doru":[2,1],"Sorin":[2,0],"Cristi":[3,0],"Paul":[2,0],"Ciprian":[3,1],"Florin B":[2,1],"Sebastian":[3,0]},"10":{"Dorin":[2,0],"Robert":[1,1],"Silviu":[1,1],"Adrian T":[2,0],"Octavian":[1,0],"Horia":[1,0],"Doru":[3,2],"Sorin":[1,0],"Cristi":[2,1],"Paul":[1,1],"Ciprian":[1,2],"Florin B":[1,1],"Sebastian":[1,0]},"11":{"Dorin":[1,1],"Robert":[2,0],"Silviu":[1,2],"Adrian T":[1,1],"Octavian":[0,2],"Horia":[1,1],"Doru":[2,0],"Sorin":[1,0],"Cristi":[3,1],"Paul":[0,0],"Ciprian":[2,1],"Florin B":[1,1],"Sebastian":[1,0]},"12":{"Dorin":[2,1],"Robert":[2,0],"Silviu":[2,1],"Adrian T":[2,0],"Octavian":[2,1],"Horia":[3,0],"Doru":[1,0],"Sorin":[2,0],"Cristi":[2,0],"Paul":[2,0],"Ciprian":[3,0],"Florin B":[1,0],"Sebastian":[3,2]},"13":{"Dorin":[2,0],"Robert":[1,1],"Silviu":[4,0],"Adrian T":[1,0],"Octavian":[2,0],"Horia":[2,1],"Doru":[0,0],"Sorin":[2,0],"Cristi":[1,0],"Paul":[2,1],"Ciprian":[0,3],"Florin B":[2,1],"Sebastian":[2,1]},"14":{"Dorin":[1,1],"Robert":[1,2],"Silviu":[1,2],"Adrian T":[0,2],"Octavian":[0,3],"Horia":[1,2],"Doru":[1,1],"Sorin":[0,2],"Cristi":[1,3],"Paul":[1,2],"Ciprian":[0,2],"Florin B":[0,1],"Sebastian":[0,2]},"15":{"Dorin":[2,1],"Robert":[2,0],"Silviu":[2,1],"Adrian T":[2,1],"Octavian":[0,0],"Horia":[3,3],"Doru":[0,2],"Sorin":[2,0],"Cristi":[2,1],"Paul":[2,0],"Ciprian":[2,0],"Florin B":[3,2],"Sebastian":[3,2]},"16":{"Dorin":[2,1],"Robert":[1,1],"Silviu":[3,0],"Adrian T":[2,0],"Octavian":[0,1],"Horia":[2,0],"Doru":[2,2],"Sorin":[2,0],"Cristi":[2,1],"Paul":[1,0],"Ciprian":[1,2],"Florin B":[1,1],"Sebastian":[2,1]},"17":{"Dorin":[1,2],"Robert":[1,1],"Silviu":[1,0],"Adrian T":[1,1],"Octavian":[1,1],"Horia":[2,1],"Doru":[1,2],"Sorin":[1,1],"Cristi":[2,2],"Paul":[2,2],"Ciprian":[3,1],"Florin B":[1,1],"Sebastian":[1,1]},"18":{"Dorin":[1,2],"Robert":[2,1],"Silviu":[0,2],"Adrian T":[1,1],"Octavian":[4,0],"Horia":[0,1],"Doru":[2,1],"Sorin":[1,1],"Cristi":[1,1],"Paul":[2,2],"Ciprian":[1,1],"Florin B":[2,2],"Sebastian":[1,0]},"19":{"Dorin":[2,1],"Robert":[2,0],"Silviu":[2,1],"Adrian T":[2,1],"Octavian":[2,2],"Horia":[2,0],"Doru":[1,2],"Sorin":[2,1],"Cristi":[2,2],"Paul":[4,0],"Ciprian":[3,0],"Florin B":[2,0],"Sebastian":[3,1]},"20":{"Dorin":[0,2],"Robert":[0,2],"Silviu":[0,1],"Adrian T":[0,2],"Octavian":[0,3],"Horia":[0,2],"Doru":[1,2],"Sorin":[0,3],"Cristi":[0,2],"Paul":[0,2],"Ciprian":[0,4],"Florin B":[0,2],"Sebastian":[0,2]},"21":{"Dorin":[3,0],"Robert":[4,0],"Silviu":[4,0],"Adrian T":[6,0],"Octavian":[4,1],"Horia":[6,0],"Doru":[2,0],"Sorin":[3,0],"Cristi":[4,0],"Paul":[5,0],"Ciprian":[5,0],"Florin B":[4,0],"Sebastian":[3,0]},"22":{"Dorin":[1,2],"Robert":[1,1],"Silviu":[1,2],"Adrian T":[1,1],"Octavian":[0,2],"Horia":[1,1],"Doru":[0,1],"Sorin":[1,1],"Cristi":[0,1],"Paul":[1,1],"Ciprian":[1,1],"Florin B":[1,1],"Sebastian":[0,1]},"23":{"Dorin":[0,2],"Robert":[1,2],"Silviu":[0,1],"Adrian T":[0,2],"Octavian":[1,1],"Horia":[0,2],"Doru":[0,2],"Sorin":[0,2],"Cristi":[1,2],"Paul":[0,3],"Ciprian":[1,4],"Florin B":[1,2],"Sebastian":[1,2]},"24":{"Dorin":[3,0],"Robert":[2,0],"Silviu":[3,0],"Adrian T":[4,0],"Octavian":[5,0],"Horia":[2,0],"Doru":[1,0],"Sorin":[3,0],"Cristi":[3,0],"Paul":[3,0],"Ciprian":[1,1],"Florin B":[3,0],"Sebastian":[2,0]},"25":{"Dorin":[3,0],"Robert":[4,0],"Silviu":[5,0],"Adrian T":[6,0],"Octavian":[6,1],"Horia":[4,0],"Doru":[3,1],"Sorin":[5,0],"Cristi":[5,0],"Paul":[3,0],"Ciprian":[3,0],"Florin B":[5,0],"Sebastian":[4,0]},"26":{"Dorin":[1,1],"Robert":[1,1],"Silviu":[0,1],"Adrian T":[1,1],"Octavian":[1,2],"Horia":[1,1],"Doru":[1,2],"Sorin":[1,1],"Cristi":[1,2],"Paul":[2,2],"Ciprian":[2,1],"Florin B":[1,1],"Sebastian":[2,1]},"27":{"Dorin":[2,0],"Robert":[2,0],"Silviu":[3,1],"Adrian T":[2,0],"Octavian":[3,0],"Horia":[3,1],"Doru":[2,0],"Sorin":[2,0],"Cristi":[3,1],"Paul":[3,1],"Ciprian":[3,2],"Florin B":[2,0],"Sebastian":[3,1]},"28":{"Dorin":[2,0],"Robert":[2,1],"Silviu":[3,1],"Adrian T":[3,0],"Octavian":[1,0],"Horia":[2,0],"Doru":[2,0],"Sorin":[3,0],"Cristi":[3,1],"Paul":[3,0],"Ciprian":[2,1],"Florin B":[2,0],"Sebastian":[1,0]},"29":{"Dorin":[0,2],"Robert":[1,3],"Silviu":[3,3],"Adrian T":[1,2],"Octavian":[1,2],"Horia":[1,3],"Doru":[2,3],"Sorin":[1,3],"Cristi":[1,1],"Paul":[1,3],"Ciprian":[1,2],"Florin B":[1,3],"Sebastian":[1,3]},"30":{"Dorin":[0,2],"Robert":[1,2],"Silviu":[2,0],"Adrian T":[0,3],"Octavian":[1,0],"Horia":[0,1],"Doru":[1,2],"Sorin":[0,3],"Cristi":[0,1],"Paul":[0,3],"Ciprian":[1,4],"Florin B":[0,3],"Sebastian":[0,2]},"31":{"Dorin":[2,1],"Robert":[2,0],"Silviu":[1,1],"Adrian T":[2,2],"Octavian":[1,1],"Horia":[1,0],"Doru":[0,0],"Sorin":[2,1],"Cristi":[2,2],"Paul":[3,1],"Ciprian":[3,1],"Florin B":[2,1],"Sebastian":[1,0]},"32":{"Dorin":[1,1],"Robert":[1,1],"Silviu":[2,1],"Adrian T":[3,1],"Octavian":[1,1],"Horia":[2,1],"Doru":[1,2],"Sorin":[1,0],"Cristi":[2,0],"Paul":[2,2],"Ciprian":[2,1],"Florin B":[2,0],"Sebastian":[2,0]},"33":{"Dorin":[2,0],"Robert":[2,1],"Silviu":[1,0],"Adrian T":[1,1],"Octavian":[2,3],"Horia":[1,2],"Doru":[1,2],"Sorin":[2,0],"Cristi":[1,1],"Paul":[3,1],"Ciprian":[2,2],"Florin B":[1,1],"Sebastian":[2,1]},"34":{"Dorin":[1,2],"Robert":[1,1],"Silviu":[1,2],"Adrian T":[1,2],"Octavian":[2,3],"Horia":[1,2],"Doru":[2,3],"Sorin":[0,1],"Cristi":[1,2],"Paul":[1,3],"Ciprian":[1,3],"Florin B":[1,2],"Sebastian":[0,1]},"35":{"Dorin":[0,2],"Robert":[1,2],"Silviu":[1,2],"Adrian T":[0,2],"Octavian":[2,2],"Horia":[0,2],"Doru":[2,2],"Sorin":[0,2],"Cristi":[0,3],"Paul":[0,3],"Ciprian":[0,3],"Florin B":[1,3],"Sebastian":[0,2]},"36":{"Dorin":[2,1],"Robert":[1,1],"Silviu":[1,1],"Adrian T":[1,1],"Octavian":[1,1],"Horia":[0,1],"Doru":[1,2],"Sorin":[1,1],"Cristi":[2,1],"Paul":[2,2],"Ciprian":[1,1],"Florin B":[1,1],"Sebastian":[1,0]},"37":{"Dorin":[3,0],"Robert":[3,0],"Silviu":[4,1],"Adrian T":[5,0],"Octavian":[5,1],"Horia":[4,0],"Doru":[2,0],"Sorin":[4,0],"Cristi":[4,0],"Paul":[5,0],"Ciprian":[6,0],"Florin B":[4,0],"Sebastian":[3,0]},"38":{"Dorin":[2,0],"Robert":[2,0],"Silviu":[2,1],"Adrian T":[2,1],"Octavian":[1,1],"Horia":[3,0],"Doru":[1,1],"Sorin":[4,0],"Cristi":[2,0],"Paul":[3,0],"Ciprian":[4,1],"Florin B":[1,1],"Sebastian":[2,1]},"39":{"Dorin":[2,1],"Robert":[1,1],"Silviu":[3,1],"Adrian T":[2,0],"Octavian":[1,0],"Horia":[2,1],"Doru":[2,1],"Sorin":[2,0],"Cristi":[1,0],"Paul":[3,1],"Ciprian":[3,2],"Florin B":[2,1],"Sebastian":[2,1]},"40":{"Dorin":[2,1],"Robert":[1,1],"Silviu":[2,0],"Adrian T":[2,0],"Octavian":[2,1],"Horia":[1,0],"Doru":[1,2],"Sorin":[1,1],"Cristi":[1,2],"Paul":[2,0],"Ciprian":[1,1],"Florin B":[1,0],"Sebastian":[2,2]},"41":{"Dorin":[0,3],"Robert":[1,2],"Silviu":[0,3],"Adrian T":[1,4],"Octavian":[0,1],"Horia":[0,3],"Doru":[0,1],"Sorin":[0,4],"Cristi":[0,2],"Paul":[0,5],"Ciprian":[1,3],"Florin B":[1,1],"Sebastian":[0,2]},"42":{"Dorin":[0,3],"Robert":[1,2],"Silviu":[0,1],"Adrian T":[0,3],"Octavian":[0,3],"Horia":[0,2],"Doru":[2,1],"Sorin":[0,2],"Cristi":[1,2],"Paul":[0,5],"Ciprian":[1,2],"Florin B":[0,2],"Sebastian":[0,2]},"43":{"Dorin":[3,0],"Robert":[2,0],"Silviu":[1,0],"Adrian T":[2,0],"Octavian":[1,1],"Horia":[2,1],"Doru":[2,2],"Sorin":[2,0],"Cristi":[2,1],"Paul":[3,1],"Ciprian":[3,1],"Florin B":[2,1],"Sebastian":[2,0]},"44":{"Dorin":[1,2],"Robert":[1,1],"Silviu":[1,2],"Adrian T":[0,1],"Octavian":[0,2],"Horia":[0,1],"Doru":[0,1],"Sorin":[0,0],"Cristi":[1,1],"Paul":[1,3],"Ciprian":[2,1],"Florin B":[1,1],"Sebastian":[0,1]},"45":{"Dorin":[3,0],"Robert":[2,0],"Silviu":[3,0],"Adrian T":[4,0],"Octavian":[3,1],"Horia":[3,0],"Doru":[2,1],"Sorin":[2,0],"Cristi":[2,0],"Paul":[3,0],"Ciprian":[3,1],"Florin B":[3,0],"Sebastian":[2,0]},"46":{"Dorin":[1,1],"Robert":[0,1],"Silviu":[1,1],"Adrian T":[1,2],"Octavian":[2,0],"Horia":[1,1],"Doru":[1,2],"Sorin":[0,1],"Cristi":[0,0],"Paul":[2,2],"Ciprian":[1,1],"Florin B":[0,1],"Sebastian":[0,1]},"47":{"Dorin":[0,3],"Robert":[0,2],"Silviu":[1,2],"Adrian T":[0,3],"Octavian":[0,1],"Horia":[1,2],"Doru":[0,1],"Sorin":[0,2],"Cristi":[0,1],"Paul":[1,3],"Ciprian":[0,3],"Florin B":[0,2],"Sebastian":[0,2]},"48":{"Dorin":[2,1],"Robert":[2,1],"Silviu":[1,0],"Adrian T":[2,0],"Octavian":[1,1],"Horia":[2,0],"Doru":[1,1],"Sorin":[2,0],"Cristi":[2,2],"Paul":[2,0],"Ciprian":[2,1],"Florin B":[1,0],"Sebastian":[1,0]},"49":{"Dorin":[2,1],"Robert":[2,0],"Silviu":[3,0],"Adrian T":[2,0],"Octavian":[2,1],"Horia":[3,0],"Doru":[2,1],"Sorin":[2,0],"Cristi":[3,2],"Paul":[2,1],"Ciprian":[2,3],"Florin B":[3,1],"Sebastian":[2,1]},"50":{"Dorin":[2,0],"Robert":[1,1],"Silviu":[2,0],"Adrian T":[3,0],"Octavian":[3,0],"Horia":[3,0],"Doru":[1,0],"Sorin":[3,0],"Cristi":[3,0],"Paul":[2,0],"Ciprian":[3,0],"Florin B":[4,0],"Sebastian":[2,0]},"51":{"Dorin":[2,1],"Robert":[2,1],"Silviu":[2,2],"Adrian T":[1,1],"Octavian":[1,1],"Horia":[2,1],"Doru":[2,1],"Sorin":[1,1],"Cristi":[2,1],"Paul":[2,2],"Ciprian":[2,1],"Florin B":[1,1],"Sebastian":[3,1]},"52":{"Dorin":[0,2],"Robert":[1,1],"Silviu":[0,2],"Adrian T":[0,1],"Octavian":[1,0],"Horia":[0,1],"Doru":[0,1],"Sorin":[0,2],"Cristi":[0,1],"Paul":[0,3],"Ciprian":[1,3],"Florin B":[0,1],"Sebastian":[0,2]},"53":{"Dorin":[0,2],"Robert":[0,3],"Silviu":[0,3],"Adrian T":[0,4],"Octavian":[0,3],"Horia":[0,3],"Doru":[1,3],"Sorin":[0,3],"Cristi":[0,3],"Paul":[0,5],"Ciprian":[0,4],"Florin B":[0,3],"Sebastian":[0,2]},"54":{"Dorin":[2,1],"Robert":[1,1],"Silviu":[0,2],"Adrian T":[1,3],"Octavian":[1,1],"Horia":[0,1],"Doru":[1,1],"Sorin":[1,2],"Cristi":[1,2],"Paul":[2,2],"Ciprian":[1,3],"Florin B":[1,3],"Sebastian":[0,1]},"55":{"Dorin":[2,0],"Robert":[2,0],"Silviu":[4,0],"Adrian T":[2,0],"Octavian":[2,0],"Horia":[2,0],"Doru":[0,2],"Sorin":[3,0],"Cristi":[1,0],"Paul":[3,0],"Ciprian":[4,1],"Florin B":[1,1],"Sebastian":[3,0]},"56":{"Dorin":[0,2],"Robert":[0,2],"Silviu":[0,2],"Adrian T":[0,1],"Octavian":[0,1],"Horia":[0,2],"Doru":[0,1],"Sorin":[0,2],"Cristi":[0,1],"Paul":[1,2],"Ciprian":[1,3],"Florin B":[0,2],"Sebastian":[0,2]},"57":{"Dorin":[3,0],"Robert":[2,0],"Silviu":[4,0],"Adrian T":[3,0],"Octavian":[5,0],"Horia":[3,0],"Doru":[2,0],"Sorin":[2,0],"Cristi":[3,0],"Paul":[3,0],"Ciprian":[5,1],"Florin B":[2,0],"Sebastian":[3,0]},"58":{"Dorin":[1,1],"Robert":[3,0],"Silviu":[1,0],"Adrian T":[1,1],"Octavian":[0,2],"Horia":[3,1],"Doru":[1,2],"Sorin":[2,0],"Cristi":[1,1],"Paul":[2,1],"Ciprian":[3,2],"Florin B":[1,1],"Sebastian":[2,1]},"59":{"Dorin":[0,2],"Robert":[0,2],"Silviu":[1,0],"Adrian T":[0,3],"Octavian":[1,3],"Horia":[2,3],"Doru":[1,1],"Sorin":[1,1],"Cristi":[0,1],"Paul":[1,3],"Ciprian":[1,3],"Florin B":[1,1],"Sebastian":[1,2]},"60":{"Dorin":[2,0],"Robert":[1,1],"Silviu":[0,0],"Adrian T":[2,0],"Octavian":[3,0],"Horia":[2,0],"Doru":[2,1],"Sorin":[0,0],"Cristi":[2,0],"Paul":[2,1],"Ciprian":[1,1],"Florin B":[1,0],"Sebastian":[1,0]},"61":{"Dorin":[3,0],"Robert":[2,0],"Silviu":[3,0],"Adrian T":[4,0],"Octavian":[3,0],"Horia":[2,0],"Doru":[2,0],"Sorin":[3,0],"Cristi":[4,2],"Paul":[2,0],"Ciprian":[2,1],"Florin B":[1,0],"Sebastian":[3,1]},"62":{"Dorin":[0,2],"Robert":[1,3],"Silviu":[0,1],"Adrian T":[0,3],"Octavian":[0,2],"Horia":[0,2],"Doru":[0,2],"Sorin":[0,2],"Cristi":[1,3],"Paul":[0,2],"Ciprian":[2,2],"Florin B":[0,2],"Sebastian":[0,2]},"63":{"Dorin":[3,0],"Robert":[3,1],"Silviu":[2,1],"Adrian T":[3,0],"Octavian":[7,0],"Horia":[3,0],"Doru":[2,0],"Sorin":[2,0],"Cristi":[3,0],"Paul":[3,0],"Ciprian":[2,1],"Florin B":[2,0],"Sebastian":[2,0]},"64":{"Dorin":[3,0],"Robert":[1,0],"Silviu":[2,0],"Adrian T":[2,0],"Octavian":[2,2],"Horia":[3,1],"Doru":[2,1],"Sorin":[2,0],"Cristi":[3,2],"Paul":[3,1],"Ciprian":[3,1],"Florin B":[1,1],"Sebastian":[2,0]},"65":{"Dorin":[1,2],"Robert":[1,1],"Silviu":[2,2],"Adrian T":[1,1],"Octavian":[0,1],"Horia":[3,4],"Doru":[0,2],"Sorin":[1,1],"Cristi":[2,2],"Paul":[1,3],"Ciprian":[1,1],"Florin B":[2,2],"Sebastian":[2,2]},"66":{"Dorin":[1,2],"Robert":[1,1],"Silviu":[1,2],"Adrian T":[1,1],"Octavian":[2,1],"Horia":[0,1],"Doru":[3,1],"Sorin":[1,0],"Cristi":[1,0],"Paul":[2,2],"Ciprian":[1,2],"Florin B":[1,0],"Sebastian":[0,0]},"67":{"Dorin":[2,1],"Robert":[1,1],"Silviu":[1,1],"Adrian T":[2,1],"Octavian":[0,2],"Horia":[2,1],"Doru":[2,2],"Sorin":[2,0],"Cristi":[2,0],"Paul":[1,0],"Ciprian":[2,3],"Florin B":[1,0],"Sebastian":[1,0]},"68":{"Dorin":[1,2],"Robert":[1,2],"Silviu":[1,2],"Adrian T":[0,1],"Octavian":[2,2],"Horia":[1,2],"Doru":[1,2],"Sorin":[0,1],"Cristi":[0,1],"Paul":[0,1],"Ciprian":[1,2],"Florin B":[1,1],"Sebastian":[1,1]},"69":{"Dorin":[3,0],"Robert":[2,1],"Silviu":[3,0],"Adrian T":[3,0],"Octavian":[2,0],"Horia":[2,0],"Doru":[1,0],"Sorin":[3,0],"Cristi":[5,0],"Paul":[4,0],"Ciprian":[3,1],"Florin B":[2,0],"Sebastian":[2,0]},"70":{"Dorin":[1,2],"Robert":[1,1],"Silviu":[0,1],"Adrian T":[1,1],"Octavian":[1,1],"Horia":[1,2],"Doru":[2,3],"Sorin":[1,2],"Cristi":[1,2],"Paul":[2,2],"Ciprian":[1,2],"Florin B":[1,2],"Sebastian":[1,2]},"71":{"Dorin":[0,2],"Robert":[1,3],"Silviu":[1,1],"Adrian T":[0,2],"Octavian":[1,0],"Horia":[1,2],"Doru":[2,2],"Sorin":[0,2],"Cristi":[0,1],"Paul":[1,3],"Ciprian":[1,4],"Florin B":[1,1],"Sebastian":[1,2]},"72":{"Dorin":[2,0],"Robert":[1,0],"Silviu":[3,0],"Adrian T":[2,0],"Octavian":[2,0],"Horia":[3,0],"Doru":[0,1],"Sorin":[2,0],"Cristi":[3,0],"Paul":[2,0],"Ciprian":[2,1],"Florin B":[2,0],"Sebastian":[2,0],"73":{"Dorin":[1,2],"Robert":[0,1],"Silviu":[0,0],"Adrian T":[1,2],"Octavian":[0,3],"Horia":[0,1],"Doru":[2,1],"Sorin":[0,2],"Cristi":[1,2],"Paul":[1,1],"Ciprian":[1,2],"Florin B":[1,1],"Sebastian":[0,2]},"74":{"Dorin":"NLY","Robert":"NLY","Silviu":"NLY","Adrian T":"NLY","Octavian":"NLY","Horia":"NLY","Doru":"NLY","Sorin":"NLY","Cristi":"NLY","Paul":"NLY","Ciprian":"NLY","Florin B":"NLY","Sebastian":"NLY"},"75":{"Dorin":"NLY","Robert":"NLY","Silviu":"NLY","Adrian T":"NLY","Octavian":"NLY","Horia":"NLY","Doru":"NLY","Sorin":"NLY","Cristi":"NLY","Paul":"NLY","Ciprian":"NLY","Florin B":"NLY","Sebastian":"NLY"},"76":{"Dorin":"NLY","Robert":"NLY","Silviu":"NLY","Adrian T":"NLY","Octavian":"NLY","Horia":"NLY","Doru":"NLY","Sorin":"NLY","Cristi":"NLY","Paul":"NLY","Ciprian":"NLY","Florin B":"NLY","Sebastian":"NLY"},"77":{"Dorin":"NLY","Robert":"NLY","Silviu":"NLY","Adrian T":"NLY","Octavian":"NLY","Horia":"NLY","Doru":"NLY","Sorin":"NLY","Cristi":"NLY","Paul":"NLY","Ciprian":"NLY","Florin B":"NLY","Sebastian":"NLY"},"78":{"Dorin":"NLY","Robert":"NLY","Silviu":"NLY","Adrian T":"NLY","Octavian":"NLY","Horia":"NLY","Doru":"NLY","Sorin":"NLY","Cristi":"NLY","Paul":"NLY","Ciprian":"NLY","Florin B":"NLY","Sebastian":"NLY"},"79":{"Dorin":"NLY","Robert":"NLY","Silviu":"NLY","Adrian T":"NLY","Octavian":"NLY","Horia":"NLY","Doru":"NLY","Sorin":"NLY","Cristi":"NLY","Paul":"NLY","Ciprian":"NLY","Florin B":"NLY","Sebastian":"NLY"},"80":{"Dorin":"NLY","Robert":"NLY","Silviu":"NLY","Adrian T":"NLY","Octavian":"NLY","Horia":"NLY","Doru":"NLY","Sorin":"NLY","Cristi":"NLY","Paul":"NLY","Ciprian":"NLY","Florin B":"NLY","Sebastian":"NLY"},"81":{"Dorin":"NLY","Robert":"NLY","Silviu":"NLY","Adrian T":"NLY","Octavian":"NLY","Horia":"NLY","Doru":"NLY","Sorin":"NLY","Cristi":"NLY","Paul":"NLY","Ciprian":"NLY","Florin B":"NLY","Sebastian":"NLY"},"82":{"Dorin":"NLY","Robert":"NLY","Silviu":"NLY","Adrian T":"NLY","Octavian":"NLY","Horia":"NLY","Doru":"NLY","Sorin":"NLY","Cristi":"NLY","Paul":"NLY","Ciprian":"NLY","Florin B":"NLY","Sebastian":"NLY"},"83":{"Dorin":"NLY","Robert":"NLY","Silviu":"NLY","Adrian T":"NLY","Octavian":"NLY","Horia":"NLY","Doru":"NLY","Sorin":"NLY","Cristi":"NLY","Paul":"NLY","Ciprian":"NLY","Florin B":"NLY","Sebastian":"NLY"},"84":{"Dorin":"NLY","Robert":"NLY","Silviu":"NLY","Adrian T":"NLY","Octavian":"NLY","Horia":"NLY","Doru":"NLY","Sorin":"NLY","Cristi":"NLY","Paul":"NLY","Ciprian":"NLY","Florin B":"NLY","Sebastian":"NLY"},"85":{"Dorin":"NLY","Robert":"NLY","Silviu":"NLY","Adrian T":"NLY","Octavian":"NLY","Horia":"NLY","Doru":"NLY","Sorin":"NLY","Cristi":"NLY","Paul":"NLY","Ciprian":"NLY","Florin B":"NLY","Sebastian":"NLY"},"86":{"Dorin":"NLY","Robert":"NLY","Silviu":"NLY","Adrian T":"NLY","Octavian":"NLY","Horia":"NLY","Doru":"NLY","Sorin":"NLY","Cristi":"NLY","Paul":"NLY","Ciprian":"NLY","Florin B":"NLY","Sebastian":"NLY"},"87":{"Dorin":"NLY","Robert":"NLY","Silviu":"NLY","Adrian T":"NLY","Octavian":"NLY","Horia":"NLY","Doru":"NLY","Sorin":"NLY","Cristi":"NLY","Paul":"NLY","Ciprian":"NLY","Florin B":"NLY","Sebastian":"NLY"},"88":{"Dorin":"NLY","Robert":"NLY","Silviu":"NLY","Adrian T":"NLY","Octavian":"NLY","Horia":"NLY","Doru":"NLY","Sorin":"NLY","Cristi":"NLY","Paul":"NLY","Ciprian":"NLY","Florin B":"NLY","Sebastian":"NLY"},"89":{"Dorin":"NLY","Robert":"NLY","Silviu":"NLY","Adrian T":"NLY","Octavian":"NLY","Horia":"NLY","Doru":"NLY","Sorin":"NLY","Cristi":"NLY","Paul":"NLY","Ciprian":"NLY","Florin B":"NLY","Sebastian":"NLY"},"90":{"Dorin":"NLY","Robert":"NLY","Silviu":"NLY","Adrian T":"NLY","Octavian":"NLY","Horia":"NLY","Doru":"NLY","Sorin":"NLY","Cristi":"NLY","Paul":"NLY","Ciprian":"NLY","Florin B":"NLY","Sebastian":"NLY"},"91":{"Dorin":"NLY","Robert":"NLY","Silviu":"NLY","Adrian T":"NLY","Octavian":"NLY","Horia":"NLY","Doru":"NLY","Sorin":"NLY","Cristi":"NLY","Paul":"NLY","Ciprian":"NLY","Florin B":"NLY","Sebastian":"NLY"},"92":{"Dorin":"NLY","Robert":"NLY","Silviu":"NLY","Adrian T":"NLY","Octavian":"NLY","Horia":"NLY","Doru":"NLY","Sorin":"NLY","Cristi":"NLY","Paul":"NLY","Ciprian":"NLY","Florin B":"NLY","Sebastian":"NLY"},"93":{"Dorin":"NLY","Robert":"NLY","Silviu":"NLY","Adrian T":"NLY","Octavian":"NLY","Horia":"NLY","Doru":"NLY","Sorin":"NLY","Cristi":"NLY","Paul":"NLY","Ciprian":"NLY","Florin B":"NLY","Sebastian":"NLY"},"94":{"Dorin":"NLY","Robert":"NLY","Silviu":"NLY","Adrian T":"NLY","Octavian":"NLY","Horia":"NLY","Doru":"NLY","Sorin":"NLY","Cristi":"NLY","Paul":"NLY","Ciprian":"NLY","Florin B":"NLY","Sebastian":"NLY"},"95":{"Dorin":"NLY","Robert":"NLY","Silviu":"NLY","Adrian T":"NLY","Octavian":"NLY","Horia":"NLY","Doru":"NLY","Sorin":"NLY","Cristi":"NLY","Paul":"NLY","Ciprian":"NLY","Florin B":"NLY","Sebastian":"NLY"},"96":{"Dorin":"NLY","Robert":"NLY","Silviu":"NLY","Adrian T":"NLY","Octavian":"NLY","Horia":"NLY","Doru":"NLY","Sorin":"NLY","Cristi":"NLY","Paul":"NLY","Ciprian":"NLY","Florin B":"NLY","Sebastian":"NLY"}};
 
 const CASTIGATOARE = {"Dorin":"Portugalia","Robert":"Franța","Silviu":"Brazilia","Adrian T":"Anglia","Octavian":"Portugalia","Horia":"Franța","Doru":"Maroc","Sorin":"Spania","Cristi":"Franța","Paul":"Portugalia","Ciprian":"Spania","Florin B":"Spania","Sebastian":"Franța"};
 
@@ -313,34 +339,68 @@ function renderStandings() {
 }
 
 let currentFilter = 'all';
+
+// Faza unui meci: 1-72 = grupe, 73+ = faze superioare
+function getMatchStage(mid, sc) {
+  if (sc.stage) return sc.stage;
+  return parseInt(mid) <= 72 ? 'Grupe' : 'Faze superioare';
+}
+
+const STAGE_ORDER = ['Grupe','Optimi','Sferturi','Semifinale','Finala mică','Finală'];
+function stageRank(s) { const i = STAGE_ORDER.indexOf(s); return i >= 0 ? i : 99; }
+
 function renderMatches(filter) {
   currentFilter = filter || currentFilter;
   const container = document.getElementById('matches-list');
   container.innerHTML = '';
 
-  // Sortăm meciurile cronologic folosind data din API. 
-  // Dacă API-ul încă nu a încărcat data, folosim ID-ul ca rezervă.
   const sortedKeys = Object.keys(SCORES).sort((a, b) => {
-    const dateA = SCORES[a].utcDate ? new Date(SCORES[a].utcDate).getTime() : 9999999999999;
-    const dateB = SCORES[b].utcDate ? new Date(SCORES[b].utcDate).getTime() : 9999999999999;
+    const stA = stageRank(getMatchStage(a, SCORES[a]));
+    const stB = stageRank(getMatchStage(b, SCORES[b]));
+    if (stA !== stB) return stA - stB;
+    const dateA = SCORES[a].utcDate ? new Date(SCORES[a].utcDate).getTime() : parseInt(a) * 1000000;
+    const dateB = SCORES[b].utcDate ? new Date(SCORES[b].utcDate).getTime() : parseInt(b) * 1000000;
     if (dateA !== dateB) return dateA - dateB;
     return parseInt(a) - parseInt(b);
   });
 
+  let lastStage = null;
+
   sortedKeys.forEach(mid => {
     const sc = SCORES[mid];
     const isPlayed = sc.s1 !== null;
-    
+    const stage = getMatchStage(mid, sc);
+    const isKnockout = parseInt(mid) >= 73;
+
+    // Filtrare
+    if (currentFilter === 'groups' && isKnockout) return;
+    if (currentFilter === 'knockout' && !isKnockout) return;
     if (currentFilter === 'played' && !isPlayed) return;
     if (currentFilter === 'pending' && isPlayed) return;
 
+    // Separator de faza
+    if (stage !== lastStage) {
+      lastStage = stage;
+      const sep = document.createElement('div');
+      sep.style.cssText = 'font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#888;padding:16px 4px 8px;border-bottom:1px solid #e8e8e0;margin-bottom:4px;';
+      const stageIcons = {'Grupe':'⚽','Optimi':'🔥','Sferturi':'⚡','Semifinale':'🏟️','Finala mică':'🥉','Finală':'🏆'};
+      sep.textContent = (stageIcons[stage] || '') + ' ' + stage;
+      container.appendChild(sep);
+    }
+
     const preds = PREDICTIONS[mid] || {};
-    const f1 = FLAGS[sc.team1] || '🏳️';
-    const f2 = FLAGS[sc.team2] || '🏳️';
+    const t1name = sc.team1 === '?' ? '?' : sc.team1;
+    const t2name = sc.team2 === '?' ? '?' : sc.team2;
+    const f1 = FLAGS[t1name] || '🏳️';
+    const f2 = FLAGS[t2name] || '🏳️';
 
     const chipHtml = PARTICIPANTS.map(p => {
       const pred = preds[p];
       if (!pred) return '';
+      // NLY = Not Loaded Yet (pronostic nestiut inca)
+      if (pred === 'NLY') {
+        return `<span class="pred-chip p-pending" style="opacity:.6"><span class="pname">${p}</span> <span style="font-size:10px;font-style:italic">NLY</span></span>`;
+      }
       const pts = calcPoints(sc.s1, sc.s2, pred[0], pred[1]);
       let cls = 'p-pending', ptsTxt = '';
       if (pts === 3) { cls = 'p-exact'; ptsTxt = ' +3'; }
@@ -349,42 +409,40 @@ function renderMatches(filter) {
       return `<span class="pred-chip ${cls}"><span class="pname">${p}</span> ${pred[0]}-${pred[1]}${pts !== null ? `<span class="pts-tag">${ptsTxt}</span>` : ''}</span>`;
     }).join('');
 
-    // Setăm etichetele pentru LIVE / Terminat / În așteptare
     let statusHtml = '';
     if (sc.isLive) {
-      statusHtml = `<span class="status" style="background:#dc2626; color:#fff;">LIVE</span>`;
+      statusHtml = `<span class="status" style="background:#dc2626; color:#fff; display:inline-flex; align-items:center; gap:4px;"><span style="width:5px;height:5px;background:#fff;border-radius:50%;animation:pulse 1.2s infinite"></span>LIVE</span>`;
     } else if (isPlayed) {
       statusHtml = `<span class="status s-done">Terminat</span>`;
     } else {
       statusHtml = `<span class="status s-pending">În așteptare</span>`;
     }
 
-    // Formatăm data din API la ora României (ex: Joi, 11.06, 22:00)
     let matchDateStr = '';
     if (sc.utcDate) {
-       const d = new Date(sc.utcDate);
-       const options = { timeZone: 'Europe/Bucharest', weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' };
-       // Litera mare la începutul zilei
-       let formattedDate = d.toLocaleString('ro-RO', options);
-       matchDateStr = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
+      const d = new Date(sc.utcDate);
+      const options = { timeZone: 'Europe/Bucharest', weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' };
+      let formattedDate = d.toLocaleString('ro-RO', options);
+      matchDateStr = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
     }
 
     const scoreHtml = isPlayed || sc.isLive
-      ? `<span class="score-num">${sc.s1 !== null ? sc.s1 : 0} — ${sc.s2 !== null ? sc.s2 : 0}</span>`
+      ? `<span class="score-num${sc.isLive ? '" style="color:#dc2626' : ''}">${sc.s1 !== null ? sc.s1 : 0} — ${sc.s2 !== null ? sc.s2 : 0}</span>`
       : `<span class="score-pending">vs</span>`;
 
     const card = document.createElement('div');
     card.className = 'match-card';
+    if (sc.isLive) card.style.cssText = 'border-color:#fca5a5; box-shadow:0 0 0 2px #fee2e2;';
     card.innerHTML = `
-      <div class="match-head">
-        <span class="match-id">Meci #${mid} ${matchDateStr ? `<span style="margin-left:8px; color:#888;">🕒 ${matchDateStr}</span>` : ''}</span>
+      <div class="match-head" style="${sc.isLive ? 'background:#fef2f2;' : ''}">
+        <span class="match-id">Meci #${mid}${matchDateStr ? ` <span style="margin-left:8px;color:#888;">🕒 ${matchDateStr}</span>` : ''}</span>
         ${statusHtml}
       </div>
       <div class="match-body">
         <div class="score-row">
-          <div class="team"><span class="flag">${f1}</span><span class="tname">${sc.team1}</span></div>
+          <div class="team"><span class="flag">${f1}</span><span class="tname">${t1name}</span></div>
           <div class="score-box">${scoreHtml}</div>
-          <div class="team team-r"><span class="tname">${sc.team2}</span><span class="flag">${f2}</span></div>
+          <div class="team team-r"><span class="tname">${t2name}</span><span class="flag">${f2}</span></div>
         </div>
         <div class="preds-section">
           <div class="preds-label">Pronosticuri</div>
@@ -498,6 +556,14 @@ async function fetchLiveScores() {
     let updated = 0;
     let liveCount = 0;
 
+    // Index pentru meciurile din faze superioare: potrivire dupa pereche de echipe
+    // Meciurile 73+ cu team1='?' vor fi populate de API
+    // Construim si un index invers: pereche echipe -> mid DOAR pentru meciurile cu echipe necunoscute
+    const knockoutSlots = Object.entries(SCORES)
+      .filter(([mid, sc]) => parseInt(mid) >= 73 && sc.team1 === '?')
+      .map(([mid]) => mid);
+    let koSlotIdx = 0; // urmatorul slot liber
+
     games.forEach(g => {
       const t1 = mapTeam(g.homeTeam?.name || g.homeTeam?.shortName || '');
       const t2 = mapTeam(g.awayTeam?.name || g.awayTeam?.shortName || '');
@@ -505,49 +571,62 @@ async function fetchLiveScores() {
       const s1 = g.score?.fullTime?.home;
       const s2 = g.score?.fullTime?.away;
 
-      //const status = g.status; 
-      //const isFinished = status === 'FINISHED';
-      //const isLive = status === 'IN_PLAY' || status === 'PAUSED';
-      // ÎNLOCUIEȘTE CU ASTA:
       const status = g.status; 
       const isFinished = status === 'FINISHED';
-      
-      // Acoperim reprizele, pauza, prelungirile, penalty-urile și o denumire generică 'LIVE'
       const isLive = ['IN_PLAY', 'PAUSED', 'EXTRA_TIME', 'PENALTY_SHOOTOUT', 'LIVE'].includes(status);
-
-      // DEBUG: Să vedem exact ce status trimite API-ul acum pentru SUA
-      if (t1 === "SUA" || t1 === "United States" || t1 === "USA") {
-          console.log(`Status trimis de API pentru SUA - Australia: [ ${status} ]`);
-      }
       if (isLive) liveCount++;
 
-      const mid = idx[t1 + '|' + t2];
-      if (mid && SCORES[mid]) {
-        // Preluăm data exactă din API și o salvăm în obiectul meciului
-        if (g.utcDate) {
-          SCORES[mid].utcDate = g.utcDate;
+      // Detectam runda meciului din API
+      const round = g.stage || g.round?.name || '';
+      const isGroupStage = round.toLowerCase().includes('group') || g.stage === 'GROUP_STAGE';
+      const isKnockout = !isGroupStage && (
+        round.toLowerCase().includes('round') || 
+        round.toLowerCase().includes('quarter') ||
+        round.toLowerCase().includes('semi') ||
+        round.toLowerCase().includes('final') ||
+        ['ROUND_OF_16', 'ROUND_OF_32', 'QUARTER_FINALS', 'SEMI_FINALS', 'THIRD_PLACE', 'FINAL'].includes(g.stage)
+      );
+
+      // Mapam runda la faza noastra
+      const stageMap = {
+        'ROUND_OF_32': 'Optimi', 'ROUND_OF_16': 'Optimi',
+        'QUARTER_FINALS': 'Sferturi', 'SEMI_FINALS': 'Semifinale',
+        'THIRD_PLACE': 'Finala mică', 'FINAL': 'Finală'
+      };
+
+      // Incercam potrivire directa prin index (grupe + meciuri faze superioare cu echipe stiute)
+      let mid = idx[t1 + '|' + t2] || idx[t2 + '|' + t1];
+
+      // Daca nu gasim si e meci din faze superioare, atribuim urmatorul slot liber cu '?'
+      if (!mid && isKnockout && t1 && t2 && t1 !== '?' && t2 !== '?') {
+        if (koSlotIdx < knockoutSlots.length) {
+          mid = knockoutSlots[koSlotIdx++];
+          // Populam echipele in slot
+          SCORES[mid].team1 = t1;
+          SCORES[mid].team2 = t2;
+          if (stageMap[g.stage]) SCORES[mid].stage = stageMap[g.stage];
+          // Adaugam in index ca sa nu mai alocam din nou
+          idx[t1 + '|' + t2] = mid;
+          idx[t2 + '|' + t1] = mid;
         }
-        
-        // Salvăm statusul LIVE pentru a schimba eticheta în roșu
+      }
+
+      if (mid && SCORES[mid]) {
+        if (g.utcDate) SCORES[mid].utcDate = g.utcDate;
+        if (stageMap[g.stage]) SCORES[mid].stage = stageMap[g.stage];
         SCORES[mid].isLive = isLive;
 
         if ((isFinished || isLive) && s1 !== null && s2 !== null && s1 !== undefined) {
-          
-          // --- LOGICA NOUĂ: Verificăm dacă echipele sunt inversate ---
           if (SCORES[mid].team1 === t1) {
-              // Ordinea e identică: salvăm normal
-              SCORES[mid].s1 = s1;
-              SCORES[mid].s2 = s2;
+            SCORES[mid].s1 = s1;
+            SCORES[mid].s2 = s2;
           } else {
-              // Ordinea e inversată de API: inversăm și noi scorul!
-              SCORES[mid].s1 = s2;
-              SCORES[mid].s2 = s1;
+            SCORES[mid].s1 = s2;
+            SCORES[mid].s2 = s1;
           }
-          
           updated++;
         }
       }
-
     });
 
     if (apiIndicator) {
@@ -557,11 +636,11 @@ async function fetchLiveScores() {
     
     document.getElementById('live-badge').style.display = liveCount > 0 ? 'flex' : 'none';
 
-    // Rerandăm cu datele și orele noi
     renderStandings();
     renderMatches();
     const playedNow = Object.values(SCORES).filter(s => s.s1 !== null).length;
-    document.getElementById('subtitle').textContent = `${playedNow} din 72 meciuri jucate · Faza grupelor`;
+    const totalMatches = Object.keys(SCORES).length;
+    document.getElementById('subtitle').textContent = `${playedNow} din ${totalMatches} meciuri jucate`;
 
   } catch (err) {
     console.warn('API error:', err);
@@ -576,7 +655,7 @@ async function fetchLiveScores() {
 // INIT
 // ═══════════════════════════════════════
 const playedInit = Object.values(SCORES).filter(s => s.s1 !== null).length;
-document.getElementById('subtitle').textContent = `${playedInit} din 72 meciuri jucate · Faza grupelor`;
+document.getElementById('subtitle').textContent = `${playedInit} din ${Object.keys(SCORES).length} meciuri jucate`;
 
 renderStandings();
 renderMatches('all');
