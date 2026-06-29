@@ -101,6 +101,21 @@
   .bonus-row:last-child { border-bottom: none; }
   .bonus-pick { font-weight: 500; }
   .bonus-pts { font-size: 12px; color: #888; }
+
+  /* ── Footer info ── */
+  .info-card { background: #fff; border: 1px solid #e8e8e0; border-radius: 12px; padding: 18px 20px; margin-bottom: 16px; }
+  .info-title { font-size: 15px; font-weight: 600; margin-bottom: 10px; }
+  .info-text { font-size: 13px; color: #555; line-height: 1.7; }
+  .score-legend { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+
+  /* ── Responsive ── */
+  @media(max-width:600px) {
+    .standings-table th:nth-child(4),
+    .standings-table td:nth-child(4) { display: none; }
+    .score-num { font-size: 20px; }
+    .tname { font-size: 13px; }
+  }
 </style>
 </head>
 <body>
@@ -140,6 +155,7 @@
         <tbody id="standings-body"></tbody>
       </table>
     </div>
+    <p style="font-size:12px;color:#aaa;text-align:center">Apasă pe un jucător pentru detalii · Actualizat din Excel & API</p>
   </div>
 
   <div id="tab-meciuri" class="section">
@@ -163,11 +179,14 @@
   </div>
 
   <div id="tab-reguli" class="section">
-    <div class="bonus-card">
-      <div class="bonus-title">Cum se calculează punctele</div>
-      <div style="font-size:14px; color:#555; line-height:1.6">
-        <p>• <b>3 puncte</b> pentru scor exact.</p>
-        <p>• <b>1 punct</b> pentru rezultat corect (1/X/2).</p>
+    <div class="info-card">
+      <div class="info-title">Cum se calculează punctele</div>
+      <div class="info-text">
+        <div class="score-legend">
+          <div class="legend-item"><span class="badge b-exact">3p</span> Scor exact ghicit</div>
+          <div class="legend-item"><span class="badge b-result">1p</span> Rezultat corect (1/X/2)</div>
+          <div class="legend-item"><span class="badge b-miss">0p</span> Pronostic greșit</div>
+        </div>
       </div>
     </div>
   </div>
@@ -189,25 +208,60 @@
 </div>
 
 <script>
-// --- CONFIGURARE ---
+// ═══════════════════════════════════════
+// DATE DIN EXCEL
+// ═══════════════════════════════════════
 const PARTICIPANTS = ["Dorin","Robert","Silviu","Adrian T","Octavian","Horia","Doru","Sorin","Cristi","Paul","Ciprian","Florin B","Sebastian"];
 
-// Pentru meciurile viitoare, dacă nu avem predicție, punem un obiect gol
-const PREDICTIONS = {
-  "73": {"Dorin":[1,2],"Robert":[0,1],"Silviu":[0,0],"Adrian T":[1,2],"Octavian":[0,3],"Horia":[0,1],"Doru":[2,1],"Sorin":[0,2],"Cristi":[1,2],"Paul":[1,1],"Ciprian":[1,2],"Florin B":[1,1],"Sebastian":[0,2]}
-  // Adaugă aici predicții viitoare când le primești
+// LIVE status per match (actualizat de API)
+const LIVE_STATUS = {};
+
+const SCORES = {"1":{"team1":"Mexic","team2":"Africa de Sud","s1":2,"s2":0},"2":{"team1":"Coreea de Sud","team2":"Cehia","s1":2,"s2":1},"3":{"team1":"Mexic","team2":"Coreea de Sud","s1":null,"s2":null},"4":{"team1":"Cehia","team2":"Africa de Sud","s1":null,"s2":null},"5":{"team1":"Cehia","team2":"Mexic","s1":null,"s2":null},"6":{"team1":"Africa de Sud","team2":"Coreea de Sud","s1":null,"s2":null},"7":{"team1":"Canada","team2":"Bosnia și Herțegovina","s1":1,"s2":1},"8":{"team1":"Qatar","team2":"Elveția","s1":1,"s2":1},"9":{"team1":"Canada","team2":"Qatar","s1":null,"s2":null},"10":{"team1":"Elveția","team2":"Bosnia și Herțegovina","s1":null,"s2":null},"11":{"team1":"Elveția","team2":"Canada","s1":null,"s2":null},"12":{"team1":"Bosnia și Herțegovina","team2":"Qatar","s1":null,"s2":null},"13":{"team1":"SUA","team2":"Paraguay","s1":4,"s2":1},"14":{"team1":"Australia","team2":"Turcia","s1":2,"s2":0},"15":{"team1":"SUA","team2":"Australia","s1":null,"s2":null},"16":{"team1":"Turcia","team2":"Paraguay","s1":null,"s2":null},"17":{"team1":"Turcia","team2":"SUA","s1":null,"s2":null},"18":{"team1":"Paraguay","team2":"Australia","s1":null,"s2":null},"19":{"team1":"Brazilia","team2":"Maroc","s1":1,"s2":1},"20":{"team1":"Haiti","team2":"Scoția","s1":0,"s2":1},"21":{"team1":"Brazilia","team2":"Haiti","s1":null,"s2":null},"22":{"team1":"Scoția","team2":"Maroc","s1":null,"s2":null},"23":{"team1":"Scoția","team2":"Brazilia","s1":null,"s2":null},"24":{"team1":"Maroc","team2":"Haiti","s1":null,"s2":null},"25":{"team1":"Germania","team2":"Curacao","s1":7,"s2":1},"26":{"team1":"Ecuador","team2":"Coasta de Fildeș","s1":0,"s2":1},"27":{"team1":"Germania","team2":"Ecuador","s1":null,"s2":null},"28":{"team1":"Coasta de Fildeș","team2":"Curacao","s1":null,"s2":null},"29":{"team1":"Coasta de Fildeș","team2":"Germania","s1":null,"s2":null},"30":{"team1":"Curacao","team2":"Ecuador","s1":null,"s2":null},"31":{"team1":"Țările de Jos","team2":"Japonia","s1":2,"s2":2},"32":{"team1":"Suedia","team2":"Tunisia","s1":5,"s2":1},"33":{"team1":"Țările de Jos","team2":"Suedia","s1":null,"s2":null},"34":{"team1":"Tunisia","team2":"Japonia","s1":null,"s2":null},"35":{"team1":"Tunisia","team2":"Țările de Jos","s1":null,"s2":null},"36":{"team1":"Japonia","team2":"Suedia","s1":null,"s2":null},"37":{"team1":"Spania","team2":"Capul Verde","s1":0,"s2":0},"38":{"team1":"Uruguay","team2":"Arabia Saudită","s1":1,"s2":1},"39":{"team1":"Spania","team2":"Uruguay","s1":null,"s2":null},"40":{"team1":"Arabia Saudită","team2":"Capul Verde","s1":null,"s2":null},"41":{"team1":"Arabia Saudită","team2":"Spania","s1":null,"s2":null},"42":{"team1":"Capul Verde","team2":"Uruguay","s1":null,"s2":null},"43":{"team1":"Belgia","team2":"Egipt","s1":1,"s2":1},"44":{"team1":"Noua Zeelandă","team2":"Iran","s1":2,"s2":2},"45":{"team1":"Belgia","team2":"Noua Zeelandă","s1":null,"s2":null},"46":{"team1":"Iran","team2":"Egipt","s1":null,"s2":null},"47":{"team1":"Iran","team2":"Belgia","s1":null,"s2":null},"48":{"team1":"Egipt","team2":"Noua Zeelandă","s1":null,"s2":null},"49":{"team1":"Franța","team2":"Senegal","s1":3,"s2":1},"50":{"team1":"Norvegia","team2":"Irak","s1":4,"s2":1},"51":{"team1":"Franța","team2":"Norvegia","s1":null,"s2":null},"52":{"team1":"Irak","team2":"Senegal","s1":null,"s2":null},"53":{"team1":"Irak","team2":"Franța","s1":null,"s2":null},"54":{"team1":"Senegal","team2":"Norvegia","s1":null,"s2":null},"55":{"team1":"Argentina","team2":"Algeria","s1":3,"s2":0},"56":{"team1":"Iordania","team2":"Austria","s1":1,"s2":3},"57":{"team1":"Argentina","team2":"Iordania","s1":null,"s2":null},"58":{"team1":"Austria","team2":"Algeria","s1":null,"s2":null},"59":{"team1":"Austria","team2":"Argentina","s1":null,"s2":null},"60":{"team1":"Algeria","team2":"Iordania","s1":null,"s2":null},"61":{"team1":"Portugalia","team2":"DR Congo","s1":1,"s2":1},"62":{"team1":"Uzbekistan","team2":"Columbia","s1":1,"s2":3},"63":{"team1":"Portugalia","team2":"Uzbekistan","s1":null,"s2":null},"64":{"team1":"Columbia","team2":"DR Congo","s1":null,"s2":null},"65":{"team1":"Columbia","team2":"Portugalia","s1":null,"s2":null},"66":{"team1":"DR Congo","team2":"Uzbekistan","s1":null,"s2":null},"67":{"team1":"Anglia","team2":"Croația","s1":4,"s2":2},"68":{"team1":"Panama","team2":"Ghana","s1":0,"s2":1},"69":{"team1":"Anglia","team2":"Panama","s1":null,"s2":null},"70":{"team1":"Ghana","team2":"Croația","s1":null,"s2":null},"71":{"team1":"Ghana","team2":"Anglia","s1":null,"s2":null},"72":{"team1":"Croația","team2":"Panama","s1":null,"s2":null},
+  "73":{"team1":"Africa de Sud","team2":"Canada","s1":0,"s2":1,"stageName":"Șaisprezecimi"}
 };
 
-// Scoruri reale (completează aici scorurile din API pe măsură ce apar)
-let SCORES = {
-  "73": {"team1":"Africa de Sud","team2":"Canada","s1":0,"s2":1,"stageName":"Șaisprezecimi","utcDate":"2026-06-28T20:00:00Z"}
+const PREDICTIONS = {"1":{"Dorin":[2,0],"Robert":[2,0],"Silviu":[3,1],"Adrian T":[2,1],"Octavian":[2,0],"Horia":[2,1],"Doru":[1,1],"Sorin":[2,0],"Cristi":[1,0],"Paul":[2,1],"Ciprian":[3,1],"Florin B":[3,2],"Sebastian":[1,0]},"2":{"Dorin":[1,1],"Robert":[1,2],"Silviu":[0,1],"Adrian T":[1,1],"Octavian":[1,1],"Horia":[1,2],"Doru":[2,3],"Sorin":[1,1],"Cristi":[2,2],"Paul":[2,1],"Ciprian":[1,3],"Florin B":[1,0],"Sebastian":[0,0]},"3":{"Dorin":[2,1],"Robert":[2,1],"Silviu":[2,0],"Adrian T":[1,1],"Octavian":[1,0],"Horia":[1,0],"Doru":[0,2],"Sorin":[1,0],"Cristi":[2,1],"Paul":[1,1],"Ciprian":[2,1],"Florin B":[1,1],"Sebastian":[2,1]},"4":{"Dorin":[2,1],"Robert":[1,1],"Silviu":[1,1],"Adrian T":[2,0],"Octavian":[0,1],"Horia":[2,0],"Doru":[2,2],"Sorin":[2,0],"Cristi":[2,1],"Paul":[1,0],"Ciprian":[4,0],"Florin B":[1,1],"Sebastian":[2,0]},"5":{"Dorin":[1,2],"Robert":[1,1],"Silviu":[0,0],"Adrian T":[1,1],"Octavian":[1,3],"Horia":[1,1],"Doru":[2,0],"Sorin":[1,1],"Cristi":[1,1],"Paul":[0,2],"Ciprian":[2,2],"Florin B":[0,0],"Sebastian":[1,2]},"6":{"Dorin":[1,2],"Robert":[1,1],"Silviu":[1,1],"Adrian T":[0,3],"Octavian":[0,2],"Horia":[0,1],"Doru":[1,2],"Sorin":[0,0],"Cristi":[1,1],"Paul":[0,1],"Ciprian":[1,3],"Florin B":[0,1],"Sebastian":[0,1]},"7":{"Dorin":[2,1],"Robert":[1,2],"Silviu":[0,0],"Adrian T":[2,0],"Octavian":[0,1],"Horia":[2,2],"Doru":[1,1],"Sorin":[1,0],"Cristi":[1,1],"Paul":[1,1],"Ciprian":[1,1],"Florin B":[1,0],"Sebastian":[2,1]},"8":{"Dorin":[1,3],"Robert":[0,2],"Silviu":[0,2],"Adrian T":[0,4],"Octavian":[2,2],"Horia":[0,2],"Doru":[0,2],"Sorin":[0,3],"Cristi":[0,2],"Paul":[0,2],"Ciprian":[1,3],"Florin B":[0,2],"Sebastian":[1,3]},"9":{"Dorin":[2,1],"Robert":[2,0],"Silviu":[3,0],"Adrian T":[2,0],"Octavian":[1,0],"Horia":[3,0],"Doru":[2,1],"Sorin":[2,0],"Cristi":[3,0],"Paul":[2,0],"Ciprian":[3,1],"Florin B":[2,1],"Sebastian":[3,0]},"10":{"Dorin":[2,0],"Robert":[1,1],"Silviu":[1,1],"Adrian T":[2,0],"Octavian":[1,0],"Horia":[1,0],"Doru":[3,2],"Sorin":[1,0],"Cristi":[2,1],"Paul":[1,1],"Ciprian":[1,2],"Florin B":[1,1],"Sebastian":[1,0]},"11":{"Dorin":[1,1],"Robert":[2,0],"Silviu":[1,2],"Adrian T":[1,1],"Octavian":[0,2],"Horia":[1,1],"Doru":[2,0],"Sorin":[1,0],"Cristi":[3,1],"Paul":[0,0],"Ciprian":[2,1],"Florin B":[1,1],"Sebastian":[1,0]},"12":{"Dorin":[2,1],"Robert":[2,0],"Silviu":[2,1],"Adrian T":[2,0],"Octavian":[2,1],"Horia":[3,0],"Doru":[1,0],"Sorin":[2,0],"Cristi":[2,0],"Paul":[2,0],"Ciprian":[3,0],"Florin B":[1,0],"Sebastian":[3,2]},"13":{"Dorin":[2,0],"Robert":[1,1],"Silviu":[4,0],"Adrian T":[1,0],"Octavian":[2,0],"Horia":[2,1],"Doru":[0,0],"Sorin":[2,0],"Cristi":[1,0],"Paul":[2,1],"Ciprian":[0,3],"Florin B":[2,1],"Sebastian":[2,1]},"14":{"Dorin":[1,1],"Robert":[1,2],"Silviu":[1,2],"Adrian T":[0,2],"Octavian":[0,3],"Horia":[1,2],"Doru":[1,1],"Sorin":[0,2],"Cristi":[1,3],"Paul":[1,2],"Ciprian":[0,2],"Florin B":[0,1],"Sebastian":[0,2]},"15":{"Dorin":[2,1],"Robert":[2,0],"Silviu":[2,1],"Adrian T":[2,1],"Octavian":[0,0],"Horia":[3,3],"Doru":[0,2],"Sorin":[2,0],"Cristi":[2,1],"Paul":[2,0],"Ciprian":[2,0],"Florin B":[3,2],"Sebastian":[3,2]},"16":{"Dorin":[2,1],"Robert":[1,1],"Silviu":[3,0],"Adrian T":[2,0],"Octavian":[0,1],"Horia":[2,0],"Doru":[2,2],"Sorin":[2,0],"Cristi":[2,1],"Paul":[1,0],"Ciprian":[1,2],"Florin B":[1,1],"Sebastian":[2,1]},"17":{"Dorin":[1,2],"Robert":[1,1],"Silviu":[1,0],"Adrian T":[1,1],"Octavian":[1,1],"Horia":[2,1],"Doru":[1,2],"Sorin":[1,1],"Cristi":[2,2],"Paul":[2,2],"Ciprian":[3,1],"Florin B":[1,1],"Sebastian":[1,1]},"18":{"Dorin":[1,2],"Robert":[2,1],"Silviu":[0,2],"Adrian T":[1,1],"Octavian":[4,0],"Horia":[0,1],"Doru":[2,1],"Sorin":[1,1],"Cristi":[1,1],"Paul":[2,2],"Ciprian":[1,1],"Florin B":[2,2],"Sebastian":[1,0]},"19":{"Dorin":[2,1],"Robert":[2,0],"Silviu":[2,1],"Adrian T":[2,1],"Octavian":[2,2],"Horia":[2,0],"Doru":[1,2],"Sorin":[2,1],"Cristi":[2,2],"Paul":[4,0],"Ciprian":[3,0],"Florin B":[2,0],"Sebastian":[3,1]},"20":{"Dorin":[0,2],"Robert":[0,2],"Silviu":[0,1],"Adrian T":[0,2],"Octavian":[0,3],"Horia":[0,2],"Doru":[1,2],"Sorin":[0,3],"Cristi":[0,2],"Paul":[0,2],"Ciprian":[0,4],"Florin B":[0,2],"Sebastian":[0,2]},"21":{"Dorin":[3,0],"Robert":[4,0],"Silviu":[4,0],"Adrian T":[6,0],"Octavian":[4,1],"Horia":[6,0],"Doru":[2,0],"Sorin":[3,0],"Cristi":[4,0],"Paul":[5,0],"Ciprian":[5,0],"Florin B":[4,0],"Sebastian":[3,0]},"22":{"Dorin":[1,2],"Robert":[1,1],"Silviu":[1,2],"Adrian T":[1,1],"Octavian":[0,2],"Horia":[1,1],"Doru":[0,1],"Sorin":[1,1],"Cristi":[0,1],"Paul":[1,1],"Ciprian":[1,1],"Florin B":[1,1],"Sebastian":[0,1]},"23":{"Dorin":[0,2],"Robert":[1,2],"Silviu":[0,1],"Adrian T":[0,2],"Octavian":[1,1],"Horia":[0,2],"Doru":[0,2],"Sorin":[0,2],"Cristi":[1,2],"Paul":[0,3],"Ciprian":[1,4],"Florin B":[1,2],"Sebastian":[1,2]},"24":{"Dorin":[3,0],"Robert":[2,0],"Silviu":[3,0],"Adrian T":[4,0],"Octavian":[5,0],"Horia":[2,0],"Doru":[1,0],"Sorin":[3,0],"Cristi":[3,0],"Paul":[3,0],"Ciprian":[1,1],"Florin B":[3,0],"Sebastian":[2,0]},"25":{"Dorin":[3,0],"Robert":[4,0],"Silviu":[5,0],"Adrian T":[6,0],"Octavian":[6,1],"Horia":[4,0],"Doru":[3,1],"Sorin":[5,0],"Cristi":[5,0],"Paul":[3,0],"Ciprian":[3,0],"Florin B":[5,0],"Sebastian":[4,0]},"26":{"Dorin":[1,1],"Robert":[1,1],"Silviu":[0,1],"Adrian T":[1,1],"Octavian":[1,2],"Horia":[1,1],"Doru":[1,2],"Sorin":[1,1],"Cristi":[1,2],"Paul":[2,2],"Ciprian":[2,1],"Florin B":[1,1],"Sebastian":[2,1]},"27":{"Dorin":[2,0],"Robert":[2,0],"Silviu":[3,1],"Adrian T":[2,0],"Octavian":[3,0],"Horia":[3,1],"Doru":[2,0],"Sorin":[2,0],"Cristi":[3,1],"Paul":[3,1],"Ciprian":[3,2],"Florin B":[2,0],"Sebastian":[3,1]},"28":{"Dorin":[2,0],"Robert":[2,1],"Silviu":[3,1],"Adrian T":[3,0],"Octavian":[1,0],"Horia":[2,0],"Doru":[2,0],"Sorin":[3,0],"Cristi":[3,1],"Paul":[3,0],"Ciprian":[2,1],"Florin B":[2,0],"Sebastian":[1,0]},"29":{"Dorin":[0,2],"Robert":[1,3],"Silviu":[3,3],"Adrian T":[1,2],"Octavian":[1,2],"Horia":[1,3],"Doru":[2,3],"Sorin":[1,3],"Cristi":[1,1],"Paul":[1,3],"Ciprian":[1,2],"Florin B":[1,3],"Sebastian":[1,3]},"30":{"Dorin":[0,2],"Robert":[1,2],"Silviu":[2,0],"Adrian T":[0,3],"Octavian":[1,0],"Horia":[0,1],"Doru":[1,2],"Sorin":[0,3],"Cristi":[0,1],"Paul":[0,3],"Ciprian":[1,4],"Florin B":[0,3],"Sebastian":[0,2]},"31":{"Dorin":[2,1],"Robert":[2,0],"Silviu":[1,1],"Adrian T":[2,2],"Octavian":[1,1],"Horia":[1,0],"Doru":[0,0],"Sorin":[2,1],"Cristi":[2,2],"Paul":[3,1],"Ciprian":[3,1],"Florin B":[2,1],"Sebastian":[1,0]},"32":{"Dorin":[1,1],"Robert":[1,1],"Silviu":[2,1],"Adrian T":[3,1],"Octavian":[1,1],"Horia":[2,1],"Doru":[1,2],"Sorin":[1,0],"Cristi":[2,0],"Paul":[2,2],"Ciprian":[2,1],"Florin B":[2,0],"Sebastian":[2,0]},"33":{"Dorin":[2,0],"Robert":[2,1],"Silviu":[1,0],"Adrian T":[1,1],"Octavian":[2,3],"Horia":[1,2],"Doru":[1,2],"Sorin":[2,0],"Cristi":[1,1],"Paul":[3,1],"Ciprian":[2,2],"Florin B":[1,1],"Sebastian":[2,1]},"34":{"Dorin":[1,2],"Robert":[1,1],"Silviu":[1,2],"Adrian T":[1,2],"Octavian":[2,3],"Horia":[1,2],"Doru":[2,3],"Sorin":[0,1],"Cristi":[1,2],"Paul":[1,3],"Ciprian":[1,3],"Florin B":[1,2],"Sebastian":[0,1]},"35":{"Dorin":[0,2],"Robert":[1,2],"Silviu":[1,2],"Adrian T":[0,2],"Octavian":[2,2],"Horia":[0,2],"Doru":[2,2],"Sorin":[0,2],"Cristi":[0,3],"Paul":[0,3],"Ciprian":[0,3],"Florin B":[1,3],"Sebastian":[0,2]},"36":{"Dorin":[2,1],"Robert":[1,1],"Silviu":[1,1],"Adrian T":[1,1],"Octavian":[1,1],"Horia":[0,1],"Doru":[1,2],"Sorin":[1,1],"Cristi":[2,1],"Paul":[2,2],"Ciprian":[1,1],"Florin B":[1,1],"Sebastian":[1,0]},"37":{"Dorin":[3,0],"Robert":[3,0],"Silviu":[4,1],"Adrian T":[5,0],"Octavian":[5,1],"Horia":[4,0],"Doru":[2,0],"Sorin":[4,0],"Cristi":[4,0],"Paul":[5,0],"Ciprian":[6,0],"Florin B":[4,0],"Sebastian":[3,0]},"38":{"Dorin":[2,0],"Robert":[2,0],"Silviu":[2,1],"Adrian T":[2,1],"Octavian":[1,1],"Horia":[3,0],"Doru":[1,1],"Sorin":[4,0],"Cristi":[2,0],"Paul":[3,0],"Ciprian":[4,1],"Florin B":[1,1],"Sebastian":[2,1]},"39":{"Dorin":[2,1],"Robert":[1,1],"Silviu":[3,1],"Adrian T":[2,0],"Octavian":[1,0],"Horia":[2,1],"Doru":[2,1],"Sorin":[2,0],"Cristi":[1,0],"Paul":[3,1],"Ciprian":[3,2],"Florin B":[2,1],"Sebastian":[2,1]},"40":{"Dorin":[2,1],"Robert":[1,1],"Silviu":[2,0],"Adrian T":[2,0],"Octavian":[2,1],"Horia":[1,0],"Doru":[1,2],"Sorin":[1,1],"Cristi":[1,2],"Paul":[2,0],"Ciprian":[1,1],"Florin B":[1,0],"Sebastian":[2,2]},"41":{"Dorin":[0,3],"Robert":[1,2],"Silviu":[0,3],"Adrian T":[1,4],"Octavian":[0,1],"Horia":[0,3],"Doru":[0,1],"Sorin":[0,4],"Cristi":[0,2],"Paul":[0,5],"Ciprian":[1,3],"Florin B":[1,1],"Sebastian":[0,2]},"42":{"Dorin":[0,3],"Robert":[1,2],"Silviu":[0,1],"Adrian T":[0,3],"Octavian":[0,3],"Horia":[0,2],"Doru":[2,1],"Sorin":[0,2],"Cristi":[1,2],"Paul":[0,5],"Ciprian":[1,2],"Florin B":[0,2],"Sebastian":[0,2]},"43":{"Dorin":[3,0],"Robert":[2,0],"Silviu":[1,0],"Adrian T":[2,0],"Octavian":[1,1],"Horia":[2,1],"Doru":[2,2],"Sorin":[2,0],"Cristi":[2,1],"Paul":[3,1],"Ciprian":[3,1],"Florin B":[2,1],"Sebastian":[2,0]},"44":{"Dorin":[1,2],"Robert":[1,1],"Silviu":[1,2],"Adrian T":[0,1],"Octavian":[0,2],"Horia":[0,1],"Doru":[0,1],"Sorin":[0,0],"Cristi":[1,1],"Paul":[1,3],"Ciprian":[2,1],"Florin B":[1,1],"Sebastian":[0,1]},"45":{"Dorin":[3,0],"Robert":[2,0],"Silviu":[3,0],"Adrian T":[4,0],"Octavian":[3,1],"Horia":[3,0],"Doru":[2,1],"Sorin":[2,0],"Cristi":[2,0],"Paul":[3,0],"Ciprian":[3,1],"Florin B":[3,0],"Sebastian":[2,0]},"46":{"Dorin":[1,1],"Robert":[0,1],"Silviu":[1,1],"Adrian T":[1,2],"Octavian":[2,0],"Horia":[1,1],"Doru":[1,2],"Sorin":[0,1],"Cristi":[0,0],"Paul":[2,2],"Ciprian":[1,1],"Florin B":[0,1],"Sebastian":[0,1]},"47":{"Dorin":[0,3],"Robert":[0,2],"Silviu":[1,2],"Adrian T":[0,3],"Octavian":[0,1],"Horia":[1,2],"Doru":[0,1],"Sorin":[0,2],"Cristi":[0,1],"Paul":[1,3],"Ciprian":[0,3],"Florin B":[0,2],"Sebastian":[0,2]},"48":{"Dorin":[2,1],"Robert":[2,1],"Silviu":[1,0],"Adrian T":[2,0],"Octavian":[1,1],"Horia":[2,0],"Doru":[1,1],"Sorin":[2,0],"Cristi":[2,2],"Paul":[2,0],"Ciprian":[2,1],"Florin B":[1,0],"Sebastian":[1,0]},"49":{"Dorin":[2,1],"Robert":[2,0],"Silviu":[3,0],"Adrian T":[2,0],"Octavian":[2,1],"Horia":[3,0],"Doru":[2,1],"Sorin":[2,0],"Cristi":[3,2],"Paul":[2,1],"Ciprian":[2,3],"Florin B":[3,1],"Sebastian":[2,1]},"50":{"Dorin":[2,0],"Robert":[1,1],"Silviu":[2,0],"Adrian T":[3,0],"Octavian":[3,0],"Horia":[3,0],"Doru":[1,0],"Sorin":[3,0],"Cristi":[3,0],"Paul":[2,0],"Ciprian":[3,0],"Florin B":[4,0],"Sebastian":[2,0]},"51":{"Dorin":[2,1],"Robert":[2,1],"Silviu":[2,2],"Adrian T":[1,1],"Octavian":[1,1],"Horia":[2,1],"Doru":[2,1],"Sorin":[1,1],"Cristi":[2,1],"Paul":[2,2],"Ciprian":[2,1],"Florin B":[1,1],"Sebastian":[3,1]},"52":{"Dorin":[0,2],"Robert":[1,1],"Silviu":[0,2],"Adrian T":[0,1],"Octavian":[1,0],"Horia":[0,1],"Doru":[0,1],"Sorin":[0,2],"Cristi":[0,1],"Paul":[0,3],"Ciprian":[1,3],"Florin B":[0,1],"Sebastian":[0,2]},"53":{"Dorin":[0,2],"Robert":[0,3],"Silviu":[0,3],"Adrian T":[0,4],"Octavian":[0,3],"Horia":[0,3],"Doru":[1,3],"Sorin":[0,3],"Cristi":[0,3],"Paul":[0,5],"Ciprian":[0,4],"Florin B":[0,3],"Sebastian":[0,2]},"54":{"Dorin":[2,1],"Robert":[1,1],"Silviu":[0,2],"Adrian T":[1,3],"Octavian":[1,1],"Horia":[0,1],"Doru":[1,1],"Sorin":[1,2],"Cristi":[1,2],"Paul":[2,2],"Ciprian":[1,3],"Florin B":[1,3],"Sebastian":[0,1]},"55":{"Dorin":[2,0],"Robert":[2,0],"Silviu":[4,0],"Adrian T":[2,0],"Octavian":[2,0],"Horia":[2,0],"Doru":[0,2],"Sorin":[3,0],"Cristi":[1,0],"Paul":[3,0],"Ciprian":[4,1],"Florin B":[1,1],"Sebastian":[3,0]},"56":{"Dorin":[0,2],"Robert":[0,2],"Silviu":[0,2],"Adrian T":[0,1],"Octavian":[0,1],"Horia":[0,2],"Doru":[0,1],"Sorin":[0,2],"Cristi":[0,1],"Paul":[1,2],"Ciprian":[1,3],"Florin B":[0,2],"Sebastian":[0,2]},"57":{"Dorin":[3,0],"Robert":[2,0],"Silviu":[4,0],"Adrian T":[3,0],"Octavian":[5,0],"Horia":[3,0],"Doru":[2,0],"Sorin":[2,0],"Cristi":[3,0],"Paul":[3,0],"Ciprian":[5,1],"Florin B":[2,0],"Sebastian":[3,0]},"58":{"Dorin":[1,1],"Robert":[3,0],"Silviu":[1,0],"Adrian T":[1,1],"Octavian":[0,2],"Horia":[3,1],"Doru":[1,2],"Sorin":[2,0],"Cristi":[1,1],"Paul":[2,1],"Ciprian":[3,2],"Florin B":[1,1],"Sebastian":[2,1]},"59":{"Dorin":[0,2],"Robert":[0,2],"Silviu":[1,0],"Adrian T":[0,3],"Octavian":[1,3],"Horia":[2,3],"Doru":[1,1],"Sorin":[1,1],"Cristi":[0,1],"Paul":[1,3],"Ciprian":[1,3],"Florin B":[1,1],"Sebastian":[1,2]},"60":{"Dorin":[2,0],"Robert":[1,1],"Silviu":[0,0],"Adrian T":[2,0],"Octavian":[3,0],"Horia":[2,0],"Doru":[2,1],"Sorin":[0,0],"Cristi":[2,0],"Paul":[2,1],"Ciprian":[1,1],"Florin B":[1,0],"Sebastian":[1,0]},"61":{"Dorin":[3,0],"Robert":[2,0],"Silviu":[3,0],"Adrian T":[4,0],"Octavian":[3,0],"Horia":[2,0],"Doru":[2,0],"Sorin":[3,0],"Cristi":[4,2],"Paul":[2,0],"Ciprian":[2,1],"Florin B":[1,0],"Sebastian":[3,1]},"62":{"Dorin":[0,2],"Robert":[1,3],"Silviu":[0,1],"Adrian T":[0,3],"Octavian":[0,2],"Horia":[0,2],"Doru":[0,2],"Sorin":[0,2],"Cristi":[1,3],"Paul":[0,2],"Ciprian":[2,2],"Florin B":[0,2],"Sebastian":[0,2]},"63":{"Dorin":[3,0],"Robert":[3,1],"Silviu":[2,1],"Adrian T":[3,0],"Octavian":[7,0],"Horia":[3,0],"Doru":[2,0],"Sorin":[2,0],"Cristi":[3,0],"Paul":[3,0],"Ciprian":[2,1],"Florin B":[2,0],"Sebastian":[2,0]},"64":{"Dorin":[3,0],"Robert":[1,0],"Silviu":[2,0],"Adrian T":[2,0],"Octavian":[2,2],"Horia":[3,1],"Doru":[2,1],"Sorin":[2,0],"Cristi":[3,2],"Paul":[3,1],"Ciprian":[3,1],"Florin B":[1,1],"Sebastian":[2,0]},"65":{"Dorin":[1,2],"Robert":[1,1],"Silviu":[2,2],"Adrian T":[1,1],"Octavian":[0,1],"Horia":[3,4],"Doru":[0,2],"Sorin":[1,1],"Cristi":[2,2],"Paul":[1,3],"Ciprian":[1,1],"Florin B":[2,2],"Sebastian":[2,2]},"66":{"Dorin":[1,2],"Robert":[1,1],"Silviu":[1,2],"Adrian T":[1,1],"Octavian":[2,1],"Horia":[0,1],"Doru":[3,1],"Sorin":[1,0],"Cristi":[1,0],"Paul":[2,2],"Ciprian":[1,2],"Florin B":[1,0],"Sebastian":[0,0]},"67":{"Dorin":[2,1],"Robert":[1,1],"Silviu":[1,1],"Adrian T":[2,1],"Octavian":[0,2],"Horia":[2,1],"Doru":[2,2],"Sorin":[2,0],"Cristi":[2,0],"Paul":[1,0],"Ciprian":[2,3],"Florin B":[1,0],"Sebastian":[1,0]},"68":{"Dorin":[1,2],"Robert":[1,2],"Silviu":[1,2],"Adrian T":[0,1],"Octavian":[2,2],"Horia":[1,2],"Doru":[1,2],"Sorin":[0,1],"Cristi":[0,1],"Paul":[0,1],"Ciprian":[1,2],"Florin B":[1,1],"Sebastian":[1,1]},"69":{"Dorin":[3,0],"Robert":[2,1],"Silviu":[3,0],"Adrian T":[3,0],"Octavian":[2,0],"Horia":[2,0],"Doru":[1,0],"Sorin":[3,0],"Cristi":[5,0],"Paul":[4,0],"Ciprian":[3,1],"Florin B":[2,0],"Sebastian":[2,0]},"70":{"Dorin":[1,2],"Robert":[1,1],"Silviu":[0,1],"Adrian T":[1,1],"Octavian":[1,1],"Horia":[1,2],"Doru":[2,3],"Sorin":[1,2],"Cristi":[1,2],"Paul":[2,2],"Ciprian":[1,2],"Florin B":[1,2],"Sebastian":[1,2]},"71":{"Dorin":[0,2],"Robert":[1,3],"Silviu":[1,1],"Adrian T":[0,2],"Octavian":[1,0],"Horia":[1,2],"Doru":[2,2],"Sorin":[0,2],"Cristi":[0,1],"Paul":[1,3],"Ciprian":[1,4],"Florin B":[1,1],"Sebastian":[1,2]},"72":{"Dorin":[2,0],"Robert":[1,0],"Silviu":[3,0],"Adrian T":[2,0],"Octavian":[2,0],"Horia":[3,0],"Doru":[0,1],"Sorin":[2,0],"Cristi":[3,0],"Paul":[2,0],"Ciprian":[2,1],"Florin B":[2,0],"Sebastian":[2,0]},
+  "73":{"Dorin":[1,2],"Robert":[0,1],"Silviu":[0,0],"Adrian T":[1,2],"Octavian":[0,3],"Horia":[0,1],"Doru":[2,1],"Sorin":[0,2],"Cristi":[1,2],"Paul":[1,1],"Ciprian":[1,2],"Florin B":[1,1],"Sebastian":[0,2]}
 };
 
 const CASTIGATOARE = {"Dorin":"Portugalia","Robert":"Franța","Silviu":"Brazilia","Adrian T":"Anglia","Octavian":"Portugalia","Horia":"Franța","Doru":"Maroc","Sorin":"Spania","Cristi":"Franța","Paul":"Portugalia","Ciprian":"Spania","Florin B":"Spania","Sebastian":"Franța"};
-const GOLGHETER = {"Dorin":"Olise","Robert":"Pedri","Silviu":"Kylian Mbappé","Adrian T":"Harry Kane","Octavian":"Vitinha","Horia":"Lautaro Martínez","Sorin":"Harry Kane","Paul":"Harry Kane","Ciprian":"Lamine Yamal","Florin B":"Mbappe","Sebastian":"Kylian Mbappé"};
 
-// --- LOGICA ---
+const GOLGHETER = {"Dorin":"Olise","Robert":"Pedri","Silviu":"Kylian Mbappé","Adrian T":"Harry Kane","Octavian":"Vitinha","Horia":"Lautaro Martínez","Sorin":"Harry Kane","Paul":"Harry Kane","Ciprian":"Lamine Yamal","Florin B":"Mbappé","Sebastian":"Kylian Mbappé"};
+
+const FLAGS = {
+  "Mexic":"🇲🇽","Africa de Sud":"🇿🇦","Coreea de Sud":"🇰🇷","Cehia":"🇨🇿","Canada":"🇨🇦","Bosnia și Herțegovina":"🇧🇦","Qatar":"🇶🇦","Elveția":"🇨🇭","SUA":"🇺🇸","Paraguay":"🇵🇾","Australia":"🇦🇺","Turcia":"🇹🇷","Brazilia":"🇧🇷","Maroc":"🇲🇦","Haiti":"🇭🇹","Scoția":"🏴󠁧󠁢󠁳󠁣󠁴󠁿","Germania":"🇩🇪","Curacao":"🇨🇼","Ecuador":"🇪🇨","Coasta de Fildeș":"🇨🇮","Țările de Jos":"🇳🇱","Japonia":"🇯🇵","Suedia":"🇸🇪","Tunisia":"🇹🇳","Spania":"🇪🇸","Capul Verde":"🇨🇻","Uruguay":"🇺🇾","Arabia Saudită":"🇸🇦","Belgia":"🇧🇪","Egipt":"🇪🇬","Noua Zeelandă":"🇳🇿","Iran":"🇮🇷","Franța":"🇫🇷","Senegal":"🇸🇳","Norvegia":"🇳🇴","Irak":"🇮🇶","Argentina":"🇦🇷","Algeria":"🇩🇿","Iordania":"🇯🇴","Austria":"🇦🇹","Portugalia":"🇵🇹","DR Congo":"🇨🇩","Uzbekistan":"🇺🇿","Columbia":"🇨🇴","Anglia":"🏴󠁧󠁢󠁥󠁮󠁧󠁿","Croația":"🇭🇷","Panama":"🇵🇦","Ghana":"🇬🇭","TBA":"🏳️"
+};
+
+const TEAM_MAP = {
+  "Mexico":"Mexic","South Africa":"Africa de Sud","Korea Republic":"Coreea de Sud",
+  "South Korea":"Coreea de Sud","Czechia":"Cehia","Czech Republic":"Cehia",
+  "Canada":"Canada","Bosnia and Herzegovina":"Bosnia și Herțegovina",
+  "Bosnia & Herzegovina":"Bosnia și Herțegovina","Bosnia-Herzegovina":"Bosnia și Herțegovina",
+  "Cape Verde Islands":"Capul Verde","Qatar":"Qatar",
+  "Switzerland":"Elveția","USA":"SUA","United States":"SUA","Paraguay":"Paraguay",
+  "Australia":"Australia","Turkey":"Turcia","Türkiye":"Turcia","Brazil":"Brazilia",
+  "Morocco":"Maroc","Haiti":"Haiti","Scotland":"Scoția","Germany":"Germania",
+  "Curaçao":"Curacao","Curacao":"Curacao","Ecuador":"Ecuador",
+  "Ivory Coast":"Coasta de Fildeș","Côte d'Ivoire":"Coasta de Fildeș",
+  "Netherlands":"Țările de Jos","Japan":"Japonia","Sweden":"Suedia",
+  "Tunisia":"Tunisia","Spain":"Spania","Cape Verde":"Capul Verde",
+  "Uruguay":"Uruguay","Saudi Arabia":"Arabia Saudită","Belgium":"Belgia",
+  "Egypt":"Egipt","New Zealand":"Noua Zeelandă","Iran":"Iran","France":"Franța",
+  "Senegal":"Senegal","Norway":"Norvegia","Iraq":"Irak","Algeria":"Algeria",
+  "Argentina":"Argentina","Jordan":"Iordania","Austria":"Austria",
+  "Portugal":"Portugalia","DR Congo":"DR Congo","Congo DR":"DR Congo",
+  "Democratic Republic of Congo":"DR Congo","Uzbekistan":"Uzbekistan",
+  "Colombia":"Columbia","England":"Anglia","Croatia":"Croația","Panama":"Panama",
+  "Ghana":"Ghana"
+};
+
+function mapTeam(name) { return TEAM_MAP[name] || name; }
+
+// ═══════════════════════════════════════
+// LOGICĂ PUNCTAJ
+// ═══════════════════════════════════════
 function getResult(a, b) { return a > b ? 1 : a < b ? -1 : 0; }
+
 function calcPoints(rs1, rs2, ps1, ps2) {
   if (rs1 === null || ps1 === null) return null;
   if (ps1 == rs1 && ps2 == rs2) return 3;
@@ -234,9 +288,16 @@ function computeStandings() {
   return totals;
 }
 
+// ═══════════════════════════════════════
+// RENDER CLASAMENT & MECIURI
+// ═══════════════════════════════════════
 function renderStandings() {
   const totals = computeStandings();
-  const sorted = PARTICIPANTS.slice().sort((a, b) => totals[b].points - totals[a].points);
+  const sorted = PARTICIPANTS.slice().sort((a, b) => {
+    if (totals[b].points !== totals[a].points) return totals[b].points - totals[a].points;
+    if (totals[b].exact !== totals[a].exact) return totals[b].exact - totals[a].exact;
+    return totals[b].result - totals[a].result;
+  });
   const tbody = document.getElementById('standings-body');
   tbody.innerHTML = '';
   sorted.forEach((name, i) => {
@@ -244,23 +305,56 @@ function renderStandings() {
     const rank = i + 1;
     const rc = rank === 1 ? 'r1' : rank === 2 ? 'r2' : rank === 3 ? 'r3' : 'rn';
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td><span class="rank-badge ${rc}">${rank}</span></td><td class="name-cell">${name}</td><td><span class="badge b-exact">${t.exact}</span></td><td><span class="badge b-result">${t.result}</span></td><td class="pts-cell">${t.points}</td>`;
+    tr.innerHTML = `
+      <td><span class="rank-badge ${rc}">${rank}</span></td>
+      <td class="name-cell">${name}</td>
+      <td><span class="badge b-exact">${t.exact}</span></td>
+      <td><span class="badge b-result">${t.result}</span></td>
+      <td class="pts-cell">${t.points}</td>`;
     tr.onclick = () => showProfile(name);
     tbody.appendChild(tr);
   });
 }
 
-function renderMatches(filter = 'all') {
+let currentFilter = 'all';
+function renderMatches(filter) {
+  currentFilter = filter || currentFilter;
   const container = document.getElementById('matches-list');
   container.innerHTML = '';
-  Object.entries(SCORES).sort((a,b) => new Date(a[1].utcDate) - new Date(b[1].utcDate)).forEach(([mid, sc]) => {
-    const isPlayed = sc.s1 !== null;
-    if (filter === 'played' && !isPlayed) return;
-    if (filter === 'pending' && isPlayed) return;
 
-    const predsHtml = PARTICIPANTS.map(p => {
-      const pred = PREDICTIONS[mid] && PREDICTIONS[mid][p];
-      if (!pred) return `<span class="pred-chip p-pending" style="color:#aaa; border-style:dashed"><span class="pname">${p}</span> NLY</span>`;
+  // Filtrăm meciurile unde echipele nu sunt setate (ex. TBA vs TBA din API)
+  const validMatches = Object.keys(SCORES).filter(mid => {
+    const sc = SCORES[mid];
+    return sc.team1 && sc.team1 !== 'TBA' && sc.team2 && sc.team2 !== 'TBA';
+  });
+
+  // Sortăm meciurile cronologic folosind data din API. 
+  const sortedKeys = validMatches.sort((a, b) => {
+    const dateA = SCORES[a].utcDate ? new Date(SCORES[a].utcDate).getTime() : 9999999999999;
+    const dateB = SCORES[b].utcDate ? new Date(SCORES[b].utcDate).getTime() : 9999999999999;
+    if (dateA !== dateB) return dateA - dateB;
+    const intA = parseInt(a), intB = parseInt(b);
+    if (!isNaN(intA) && !isNaN(intB)) return intA - intB;
+    return a.localeCompare(b);
+  });
+
+  sortedKeys.forEach(mid => {
+    const sc = SCORES[mid];
+    const isPlayed = sc.s1 !== null;
+    
+    if (currentFilter === 'played' && !isPlayed) return;
+    if (currentFilter === 'pending' && isPlayed) return;
+
+    const preds = PREDICTIONS[mid] || {};
+    const f1 = FLAGS[sc.team1] || '🏳️';
+    const f2 = FLAGS[sc.team2] || '🏳️';
+
+    // Generarea etichetelor cu predicții sau NLY
+    const chipHtml = PARTICIPANTS.map(p => {
+      const pred = preds[p];
+      if (!pred) {
+          return `<span class="pred-chip p-pending" style="color: #999; border-style: dashed;"><span class="pname">${p}</span> NLY</span>`;
+      }
       const pts = calcPoints(sc.s1, sc.s2, pred[0], pred[1]);
       let cls = 'p-pending', ptsTxt = '';
       if (pts === 3) { cls = 'p-exact'; ptsTxt = ' +3'; }
@@ -269,46 +363,275 @@ function renderMatches(filter = 'all') {
       return `<span class="pred-chip ${cls}"><span class="pname">${p}</span> ${pred[0]}-${pred[1]}${pts !== null ? `<span class="pts-tag">${ptsTxt}</span>` : ''}</span>`;
     }).join('');
 
+    // Setăm etichetele pentru LIVE / Terminat / În așteptare
+    let statusHtml = '';
+    if (sc.isLive) {
+      statusHtml = `<span class="status" style="background:#dc2626; color:#fff;">LIVE</span>`;
+    } else if (isPlayed) {
+      statusHtml = `<span class="status s-done">Terminat</span>`;
+    } else {
+      statusHtml = `<span class="status s-pending">În așteptare</span>`;
+    }
+
+    // Formatăm data din API la ora României
+    let matchDateStr = '';
+    if (sc.utcDate) {
+       const d = new Date(sc.utcDate);
+       const options = { timeZone: 'Europe/Bucharest', weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' };
+       let formattedDate = d.toLocaleString('ro-RO', options);
+       matchDateStr = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
+    }
+
+    const scoreHtml = isPlayed || sc.isLive
+      ? `<span class="score-num ${sc.isLive ? 'live-score' : ''}">${sc.s1 !== null ? sc.s1 : 0} — ${sc.s2 !== null ? sc.s2 : 0}</span>`
+      : `<span class="score-pending">vs</span>`;
+
+    const titleHtml = sc.stageName ? `<span style="color:#d97706; font-weight:700;">🏆 ${sc.stageName}</span>` : `Meci #${mid}`;
+
+    const card = document.createElement('div');
+    card.className = sc.isLive ? 'match-card live-card' : 'match-card';
+    card.innerHTML = `
+      <div class="match-head">
+        <span class="match-id">${titleHtml} ${matchDateStr ? `<span style="margin-left:8px; color:#888;">🕒 ${matchDateStr}</span>` : ''}</span>
+        ${statusHtml}
+      </div>
+      <div class="match-body">
+        <div class="score-row">
+          <div class="team"><span class="flag">${f1}</span><span class="tname">${sc.team1}</span></div>
+          <div class="score-box">${scoreHtml}</div>
+          <div class="team team-r"><span class="tname">${sc.team2}</span><span class="flag">${f2}</span></div>
+        </div>
+        <div class="preds-section">
+          <div class="preds-label">Pronosticuri</div>
+          <div class="preds-grid">${chipHtml}</div>
+        </div>
+      </div>`;
+    container.appendChild(card);
+  });
+}
+
+function filterMatches(filter, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderMatches(filter);
+}
+
+function renderBonus() {
+  const wList = document.getElementById('bonus-winner-list');
+  const gList = document.getElementById('bonus-gold-list');
+  wList.innerHTML = ''; gList.innerHTML = '';
+  PARTICIPANTS.forEach(p => {
+    const pickW = CASTIGATOARE[p] || '—';
+    const pickG = GOLGHETER[p] || '—';
+    wList.innerHTML += `<div class="bonus-row"><span><strong>${p}</strong></span><span class="bonus-pick">${pickW}</span></div>`;
+    gList.innerHTML += `<div class="bonus-row"><span><strong>${p}</strong></span><span class="bonus-pick">${pickG}</span></div>`;
+  });
+}
+
+function showProfile(name) {
+  const totals = computeStandings();
+  const t = totals[name];
+  document.getElementById('profil-name').textContent = name;
+  document.getElementById('profil-pts').textContent = t.points;
+  document.getElementById('profil-exact').textContent = t.exact;
+  document.getElementById('profil-result').textContent = t.result;
+  document.getElementById('profil-miss').textContent = t.miss;
+
+  const container = document.getElementById('profil-matches');
+  container.innerHTML = '';
+  Object.entries(SCORES).forEach(([mid, sc]) => {
+    if (sc.s1 === null) return;
+    const pred = PREDICTIONS[mid] && PREDICTIONS[mid][name];
+    if (!pred) return;
+    const pts = calcPoints(sc.s1, sc.s2, pred[0], pred[1]);
+    const f1 = FLAGS[sc.team1] || '🏳️';
+    const f2 = FLAGS[sc.team2] || '🏳️';
+    let chipCls = 'pred-chip p-miss', ptsLabel = '0 pct';
+    if (pts === 3) { chipCls = 'pred-chip p-exact'; ptsLabel = '+3 pct'; }
+    else if (pts === 1) { chipCls = 'pred-chip p-result'; ptsLabel = '+1 pct'; }
+
     container.innerHTML += `
       <div class="match-card">
-        <div class="match-head"><span>${sc.stageName || 'Meci'} #${mid}</span> <span class="status ${isPlayed ? 's-done' : 's-pending'}">${isPlayed ? 'Terminat' : 'Așteptare'}</span></div>
         <div class="match-body">
-          <div class="score-row"><div class="team"><span class="tname">${sc.team1}</span></div><div class="score-box"><span class="score-num">${isPlayed ? sc.s1+' - '+sc.s2 : 'vs'}</span></div><div class="team team-r"><span class="tname">${sc.team2}</span></div></div>
-          <div class="preds-section"><div class="preds-label">Pronosticuri</div><div class="preds-grid">${predsHtml}</div></div>
+          <div class="score-row">
+            <div class="team"><span class="flag">${f1}</span><span class="tname">${sc.team1}</span></div>
+            <div class="score-box"><span class="score-num">${sc.s1} — ${sc.s2}</span></div>
+            <div class="team team-r"><span class="tname">${sc.team2}</span><span class="flag">${f2}</span></div>
+          </div>
+          <div class="preds-section">
+            <span class="${chipCls}"><span class="pname">Pronostic:</span> ${pred[0]}-${pred[1]} <span class="pts-tag">${ptsLabel}</span></span>
+          </div>
         </div>
       </div>`;
   });
+  showTab('profil');
 }
 
 function showTab(id) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + id).classList.add('active');
-  document.querySelector(`[onclick="showTab('${id}')"]`)?.classList.add('active');
+  const btns = document.querySelectorAll('.tab-btn');
+  btns.forEach(b => { if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + id + "'")) b.classList.add('active'); });
 }
 
-function filterMatches(f, btn) {
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderMatches(f);
+function buildMatchIndex() {
+  const idx = {};
+  Object.entries(SCORES).forEach(([mid, sc]) => { 
+    idx[sc.team1 + '|' + sc.team2] = mid; 
+    idx[sc.team2 + '|' + sc.team1] = mid; 
+  });
+  return idx;
 }
 
-function showProfile(name) {
-  document.getElementById('profil-name').textContent = name;
-  const t = computeStandings()[name];
-  document.getElementById('profil-pts').textContent = t.points;
-  document.getElementById('profil-exact').textContent = t.exact;
-  document.getElementById('profil-result').textContent = t.result;
-  document.getElementById('profil-miss').textContent = t.miss;
-  showTab('profil');
+
+// ═══════════════════════════════════════
+// API FETCH LIVE - football-data.org
+// ═══════════════════════════════════════
+async function fetchLiveScores() {
+  const apiIndicator = document.getElementById('api-status');
+  if (apiIndicator) { apiIndicator.textContent = '⏳ Se actualizează...'; apiIndicator.style.color = '#888'; }
+  
+  const API_KEY = 'ce8fc0d4521c403c80025b5b3d4b2d86'; 
+
+  try {
+    const cacheBuster = new Date().getTime();
+    const targetUrl = `https://api.football-data.org/v4/competitions/WC/matches?_=${cacheBuster}`;
+    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
+
+    const response = await fetch(proxyUrl, {
+      method: 'GET',
+      headers: { 'X-Auth-Token': API_KEY, 'Accept': 'application/json' }
+    });
+
+    if (!response.ok) throw new Error('HTTP status ' + response.status);
+
+    const data = await response.json();
+    const games = data.matches || [];
+    if (!games.length) throw new Error('Nu s-au găsit meciuri în răspuns');
+
+    const idx = buildMatchIndex();
+    let updated = 0;
+    let liveCount = 0;
+
+    games.forEach(g => {
+      const t1 = mapTeam(g.homeTeam?.name || g.homeTeam?.shortName || '');
+      const t2 = mapTeam(g.awayTeam?.name || g.awayTeam?.shortName || '');
+      
+      const s1 = g.score?.fullTime?.home;
+      const s2 = g.score?.fullTime?.away;
+
+      const status = g.status; 
+      const isFinished = status === 'FINISHED';
+      
+      // Acoperim reprizele, pauza, prelungirile, penalty-urile
+      const isLive = ['IN_PLAY', 'PAUSED', 'EXTRA_TIME', 'PENALTY_SHOOTOUT', 'LIVE'].includes(status);
+
+      if (isLive) liveCount++;
+
+      // VERIFICĂM DACĂ E FAZĂ ELIMINATORIE SAU GRUPE
+      if (g.stage && g.stage !== 'GROUP_STAGE') {
+          const stageMap = {
+            'LAST_32': 'Șaisprezecimi', 'LAST_16': 'Optimi', 'QUARTER_FINALS': 'Sferturi',
+            'SEMI_FINALS': 'Semifinale', 'THIRD_PLACE': 'Finala Mică', 'FINAL': 'FINALA'
+          };
+          
+          let mid = idx[t1 + '|' + t2] || idx[t2 + '|' + t1];
+          
+          // Dacă e meci nou din API care nu există încă în lista noastră
+          if (!mid) {
+              mid = 'KO_' + g.id;
+              SCORES[mid] = {
+                  team1: t1 || 'TBA',
+                  team2: t2 || 'TBA',
+                  s1: null,
+                  s2: null,
+                  stageName: stageMap[g.stage] || 'Fază Eliminatorie',
+                  utcDate: g.utcDate,
+                  isLive: false
+              };
+              idx[t1 + '|' + t2] = mid; // Îl adăugăm la index
+          }
+          
+          // Suprascriem permanent echipele și orele pt meciurile de KO
+          SCORES[mid].team1 = t1 || 'TBA';
+          SCORES[mid].team2 = t2 || 'TBA';
+          if (g.utcDate) SCORES[mid].utcDate = g.utcDate;
+          SCORES[mid].isLive = isLive;
+          
+          if ((isFinished || isLive) && s1 !== null && s2 !== null && s1 !== undefined) {
+              if (SCORES[mid].team1 === t1) {
+                  SCORES[mid].s1 = s1; SCORES[mid].s2 = s2;
+              } else {
+                  SCORES[mid].s1 = s2; SCORES[mid].s2 = s1;
+              }
+              updated++;
+          }
+      } else {
+          // Logica normală pentru meciurile din grupe
+          const mid = idx[t1 + '|' + t2];
+          if (mid && SCORES[mid]) {
+            if (g.utcDate) {
+              SCORES[mid].utcDate = g.utcDate;
+            }
+            
+            SCORES[mid].isLive = isLive;
+
+            if ((isFinished || isLive) && s1 !== null && s2 !== null && s1 !== undefined) {
+              if (SCORES[mid].team1 === t1) {
+                  SCORES[mid].s1 = s1; SCORES[mid].s2 = s2;
+              } else {
+                  SCORES[mid].s1 = s2; SCORES[mid].s2 = s1;
+              }
+              updated++;
+            }
+          }
+      }
+
+    });
+
+    if (apiIndicator) {
+      apiIndicator.textContent = `🟢 API Live (football-data) · Actualizat (Apasă pt refresh)`;
+      apiIndicator.style.color = liveCount > 0 ? '#dc2626' : '#16a34a';
+    }
+    
+    document.getElementById('live-badge').style.display = liveCount > 0 ? 'flex' : 'none';
+
+    // Rerandăm cu datele și orele noi
+    renderStandings();
+    renderMatches();
+    const playedNow = Object.values(SCORES).filter(s => s.s1 !== null).length;
+    document.getElementById('subtitle').textContent = `${playedNow} meciuri jucate · Actualizat Live`;
+
+  } catch (err) {
+    console.warn('API error:', err);
+    if (apiIndicator) {
+      apiIndicator.textContent = '🟡 Scoruri locale. (Apasă pt reîncercare)';
+      apiIndicator.style.color = '#d97706';
+    }
+  }
 }
 
-renderStandings(); renderMatches(); renderBonus();
-function renderBonus() {
-  document.getElementById('bonus-winner-list').innerHTML = PARTICIPANTS.map(p => `<div class="bonus-row"><span>${p}</span><span>${CASTIGATOARE[p]}</span></div>`).join('');
-  document.getElementById('bonus-gold-list').innerHTML = PARTICIPANTS.map(p => `<div class="bonus-row"><span>${p}</span><span>${GOLGHETER[p]}</span></div>`).join('');
-}
-document.getElementById('subtitle').textContent = "Concurs activ";
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+const playedInit = Object.values(SCORES).filter(s => s.s1 !== null).length;
+document.getElementById('subtitle').textContent = `${playedInit} meciuri jucate`;
+
+renderStandings();
+renderMatches('all');
+renderBonus();
+
+const apiDiv = document.createElement('div');
+apiDiv.id = 'api-status';
+apiDiv.style.cssText = 'text-align:center; font-size:12px; padding:8px; cursor:pointer; font-weight:500; border-bottom:1px solid #e8e8e0; background:#fff;';
+apiDiv.textContent = 'Se încarcă scoruri live...';
+apiDiv.onclick = fetchLiveScores;
+document.querySelector('.content').insertBefore(apiDiv, document.querySelector('.section'));
+
+fetchLiveScores();
+setInterval(fetchLiveScores, 4 * 60 * 1000);
+
 </script>
 </body>
 </html>
