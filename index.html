@@ -269,8 +269,8 @@ const PREDICTIONS = {
   "92":{"Dorin":[1, 1],"Robert":[2, 1],"Silviu":[2, 1],"Adrian T":[1, 1],"Octavian":[2, 1],"Horia":[2, 1],"Doru":[2, 2],"Sorin":[1, 1],"Cristi":[1, 1],"Paul":[2, 2],"Ciprian":[1, 0],"Florin B":[1, 2],"Sebastian":[1, 1]},
   "93":{"Dorin":[1, 2],"Robert":[2, 0],"Silviu":[2, 1],"Adrian T":[1, 1],"Octavian":[2, 2],"Horia":[1, 1],"Doru":[0, 1],"Sorin":[1, 1],"Cristi":[2, 1],"Paul":[1, 1],"Ciprian":[2, 1],"Florin B":[1, 1],"Sebastian":[1, 1]},
   "94":{"Dorin":[2, 1],"Robert":[1, 1],"Silviu":[1, 2],"Adrian T":[0, 2],"Octavian":[2, 2],"Horia":[1, 2],"Doru":[2, 2],"Sorin":[1, 2],"Cristi":[1, 1],"Paul":[0, 1],"Ciprian":[0, 2],"Florin B":[1, 3],"Sebastian":[1, 2]},
-  "95":{"Dorin":[2, 0],"Robert":[3, 1],"Silviu":[2, 1],"Adrian T":[3, 1],"Horia":[3, 1],"Doru":[1, 1],"Sorin":[2, 1],"Cristi":[2, 0],"Paul":[2, 2],"Ciprian":[1, 2],"Florin B":[1, 1],"Sebastian":[2, 0]},
-  "96":{"Dorin":[1, 2],"Robert":[2, 1],"Silviu":[1, 1],"Adrian T":[0, 1],"Horia":[2, 1],"Doru":[0, 2],"Sorin":[0, 0],"Cristi":[1, 2],"Paul":[2, 3],"Ciprian":[1, 0],"Florin B":[1, 1],"Sebastian":[1, 2]}
+  "95":{"Dorin":[2, 0],"Robert":[3, 1],"Silviu":[2, 1],"Adrian T":[3, 1],"Octavian":[2, 0],"Horia":[3, 1],"Doru":[1, 1],"Sorin":[2, 1],"Cristi":[2, 0],"Paul":[2, 2],"Ciprian":[1, 2],"Florin B":[1, 1],"Sebastian":[2, 0]},
+  "96":{"Dorin":[1, 2],"Robert":[2, 1],"Silviu":[1, 1],"Adrian T":[0, 1],"Octavian":[1, 1],"Horia":[2, 1],"Doru":[0, 2],"Sorin":[0, 0],"Cristi":[1, 2],"Paul":[2, 3],"Ciprian":[1, 0],"Florin B":[1, 1],"Sebastian":[1, 2]}
 };
 
 const CASTIGATOARE = {"Dorin":"Portugalia","Robert":"Franța","Silviu":"Brazilia","Adrian T":"Anglia","Octavian":"Portugalia","Horia":"Franța","Doru":"Maroc","Sorin":"Spania","Cristi":"Franța","Paul":"Portugalia","Ciprian":"Spania","Florin B":"Spania","Sebastian":"Franța"};
@@ -733,7 +733,7 @@ apiDiv.id = 'api-status';
 apiDiv.style.cssText = 'text-align:center; font-size:12px; padding:8px; cursor:pointer; font-weight:500; border-bottom:1px solid #e8e8e0; background:#fff;';
 apiDiv.textContent = 'Se încarcă scoruri live...';
 apiDiv.onclick = fetchLiveScores;
-document.querySelector('.content').insertBefore(apiDiv, document.querySelector('.section'));
+const contentEl = document.querySelector('.content'); if (contentEl) { const firstSection = contentEl.querySelector('.section'); if (firstSection) contentEl.insertBefore(apiDiv, firstSection); else contentEl.appendChild(apiDiv); }
 
 fetchLiveScores();
 setInterval(fetchLiveScores, 4 * 60 * 1000);
